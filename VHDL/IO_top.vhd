@@ -51,8 +51,8 @@ architecture dfl of IO_top is
 	SIGNAL D_adress : STD_LOGIC_VECTOR (3 DOWNTO 0);
 begin
     
-    D_adress <= (3=>address(BUS_W-1),2=>address(4),1=>address(3),0=>address(2)); --FOR QUARTUS!!!
-	--D_adress <= (3=>address(BUS_W-1),2=>address(2),1=>address(1),0=>address(0));
+    --D_adress <= (3=>address(BUS_W-1),2=>address(4),1=>address(3),0=>address(2)); --FOR QUARTUS!!!
+	D_adress <= (3=>address(BUS_W-1),2=>address(2),1=>address(1),0=>address(0));
 	
 	dataout <= Out_SW   WHEN CS(6) = '1' ELSE
 			   Out_LEDG WHEN CS(0) = '1' ELSE

@@ -9,7 +9,7 @@ LIBRARY altera_mf;
 USE altera_mf.altera_mf_components.all;
 
 ENTITY dmemory IS
-    GENERIC (BUS_W : INTEGER := 8; ADD_BUS: INTEGER :=8); -- QUARTUS MODE = 12; 10 | MODELSIM = 8; 8
+    GENERIC (BUS_W : INTEGER := 10; ADD_BUS: INTEGER :=8); -- QUARTUS MODE = 12; 10 | MODELSIM = 8; 8
              
     PORT(   read_data              : OUT    STD_LOGIC_VECTOR( 31 DOWNTO 0 );
             address                : IN     STD_LOGIC_VECTOR( BUS_W-1 DOWNTO 0 );
