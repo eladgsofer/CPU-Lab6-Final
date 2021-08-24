@@ -4,8 +4,8 @@ USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.STD_LOGIC_ARITH.ALL;
 
 ENTITY MIPS IS
-    GENERIC (BUS_W : INTEGER := 12; ADD_BUS: INTEGER :=10; QUARTUS : INTEGER := 1); -- QUARTUS MODE = 12; 10 | MODELSIM = 8; 8
-        --GENERIC (BUS_W : INTEGER := 8; ADD_BUS: INTEGER :=8; QUARTUS : INTEGER := 0); -- QUARTUS MODE = 12; 10 | MODELSIM = 8; 8
+    GENERIC (BUS_W : INTEGER := 12; ADD_BUS: INTEGER :=10; QUARTUS : INTEGER := 1); -- QUARTUS MODE = 12; 10 | MODELSIM = 10; 8
+        --GENERIC (BUS_W : INTEGER := 8; ADD_BUS: INTEGER :=8; QUARTUS : INTEGER := 0); -- QUARTUS MODE = 12; 10 | MODELSIM = 10; 8
     PORT( reset, clock                  : IN    STD_LOGIC; 
         -- Output important signals to pins for easy display in Simulator
         PC                              : OUT STD_LOGIC_VECTOR( 9 DOWNTO 0 );
@@ -90,10 +90,20 @@ COMPONENT dmemory IS
             address             : IN    STD_LOGIC_VECTOR( BUS_W-1 DOWNTO 0 );
             write_data          : IN    STD_LOGIC_VECTOR( 31 DOWNTO 0 );
             MemRead, Memwrite   : IN    STD_LOGIC;
-            clock,reset         : IN    STD_LOGIC;
+            clock,reset         : IN    STD_LOGIC);
+END COMPONENT;
+
+COMPONENT IO_top IS
+  GENERIC (BUS_W : INTEGER := 8); -- QUARTUS MODE = 12; 10 | MODELSIM = 8; 8
+  
+PORT (    datain : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+            address : IN STD_LOGIC_VECTOR (BUS_W-1 DOWNTO 0);
             SW : IN STD_LOGIC_VECTOR (7 DOWNTO 0);
+            clk, MemRead, MemWrite: IN std_logic;
+            
             LEDG, LEDR : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
-            HEX0, HEX1, HEX2, HEX3 : OUT STD_LOGIC_VECTOR (6 DOWNTO 0));
+            HEX0, HEX1, HEX2, HEX3 : OUT STD_LOGIC_VECTOR (6 DOWNTO 0);
+            dataout: OUT STD_LOGIC_VECTOR(31 downto 0));
 END COMPONENT;
 
                     -- declare signals used to connect VHDL components
@@ -120,6 +130,9 @@ END COMPONENT;
     SIGNAL Instruction      : STD_LOGIC_VECTOR( 31 DOWNTO 0 );
     SIGNAL addressQuartus   : STD_LOGIC_VECTOR( BUS_W-1 DOWNTO 0 );
     SIGNAL resetSync        : STD_LOGIC;
+    SIGNAL write_clock      : STD_LOGIC;
+    SIGNAL readDataMem, readDataIo : STD_LOGIC_VECTOR(31 downto 0);
+    
     --SIGNAL Switches         : STD_LOGIC_VECTOR( 7 DOWNTO 0 );
 BEGIN
                     -- copy important signals to output pins for easy 
@@ -128,14 +141,18 @@ BEGIN
    ALU_result_out   <= ALU_result;
    read_data_1_out  <= read_data_1;
    read_data_2_out  <= read_data_2;
-   write_data_out   <= read_data                    WHEN MemtoReg = "01" ELSE 
-                       X"00000" & B"00" & PC_plus_4 WHEN MemtoReg = "10" ELSE
-                       ALU_result;
+   write_data_out   <= read_data                            WHEN MemtoReg = "01" ELSE  -- Load Word writes to regs from memory
+                       X"00000" & B"00" & PC_plus_4         WHEN MemtoReg = "10" ELSE  -- jump and link writes to reg 31 from pc+4
+                       Instruction( 15 DOWNTO 0 )& X"0000"  WHEN MemtoReg = "11" ELSE  -- Load upper immediate writes to regs from (immediate << 16)
+                       ALU_result;                                                     -- all others write to regs from alu result
    Branch_out       <= Branch;
    Zero_out         <= Zero;
    RegWrite_out     <= RegWrite;
    MemWrite_out     <= MemWrite;    
    addressQuartus   <= ALU_Result(BUS_W-1 DOWNTO 2) & "00"; 
+
+   read_data <= readDataIo WHEN ALU_result(BUS_W-1) = '1' ELSE readDataMem;  
+   write_clock <= NOT clock;
    --Switches         <= SW & reset;
  --address          <= ALU_Result(11 DOWNTO 2) & "00"; 
  
@@ -208,41 +225,81 @@ BEGIN
        MEM:  dmemory
         GENERIC MAP(BUS_W => BUS_W, 
                     ADD_BUS => ADD_BUS) -- QUARTUS MODE = 12; 10 | MODELSIM = 8; 8
-        PORT MAP (  read_data       => read_data,
+        PORT MAP (  read_data       => readDataMem,
                     address         => addressQuartus, --jump memory address by 4
                     write_data      => read_data_2,
                     MemRead         => MemRead, 
                     Memwrite        => MemWrite, 
                     clock           => clock,  
-                    reset           => resetSync,
-                    SW => SW,
-                    LEDG => LEDG,
-                    LEDR=> LEDR,
-                    HEX0 => HEX0,
-                    HEX1 => HEX1,
-                    HEX2 => HEX2,
-                    HEX3 => HEX3);
+                    reset           => resetSync);
+       IO: IO_top 
+        GENERIC MAP(BUS_W    => BUS_W)
+
+        PORT MAP (datain   => read_data_2,
+                  address  => addressQuartus,        
+                  SW       => SW,
+                  clk      => write_clock,
+                  MemRead  => MemRead,
+                  MemWrite => Memwrite,
+                  LEDG     => LEDG,
+                  LEDR     => LEDR,
+                  HEX0     => HEX0,
+                  HEX1     => HEX1,
+                  HEX2     => HEX2,
+                  HEX3     => HEX3,
+                  dataout  => readDataIo);
+        
+       
     END GENERATE;
     
     MODELSIM_MEM : IF QUARTUS = 0 GENERATE
         MEM:  dmemory
         GENERIC MAP(BUS_W => BUS_W, 
                     ADD_BUS => ADD_BUS) -- QUARTUS MODE = 12; 10 | MODELSIM = 8; 8
-        PORT MAP (  read_data       => read_data,
+        PORT MAP (  read_data       => readDataMem,
                     address         => ALU_Result (BUS_W+1 DOWNTO 2), --jump memory address by 4
                     write_data      => read_data_2,
                     MemRead         => MemRead, 
                     Memwrite        => MemWrite, 
                     clock           => clock,  
-                    reset           => resetSync,
-                    SW => SW,
-                    LEDG => LEDG,
-                    LEDR=> LEDR,
-                    HEX0 => HEX0,
-                    HEX1 => HEX1,
-                    HEX2 => HEX2,
-                    HEX3 => HEX3);
+                    reset           => resetSync);
+                    
+        IO: IO_top 
+        GENERIC MAP(BUS_W    => BUS_W)
+
+        PORT MAP (datain   => read_data_2,
+                  address  => ALU_Result (BUS_W+1 DOWNTO 2),        
+                  SW       => SW,
+                  clk      => write_clock,
+                  MemRead  => MemRead,
+                  MemWrite => Memwrite,
+                  LEDG     => LEDG,
+                  LEDR     => LEDR,
+                  HEX0     => HEX0,
+                  HEX1     => HEX1,
+                  HEX2     => HEX2,
+                  HEX3     => HEX3,
+                  dataout  => readDataIo);
     END GENERATE;
+    
+    
+--    COMPONENT IO_top IS
+  --GENERIC (BUS_W : INTEGER := 8); -- QUARTUS MODE = 12; 10 | MODELSIM = 8; 8
+  
+--PORT (    datain : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+  --          address : IN STD_LOGIC_VECTOR (BUS_W-1 DOWNTO 0);
+    --        SW : IN STD_LOGIC_VECTOR (7 DOWNTO 0);
+      --      clk, MemRead, MemWrite: IN std_logic;
+            
+        --    LEDG, LEDR : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
+           -- HEX0, HEX1, HEX2, HEX3 : OUT STD_LOGIC_VECTOR (6 DOWNTO 0);
+          --  dataout: OUT STD_LOGIC_VECTOR(31 downto 0));
+--END COMPONENT;
+
+ 
+--TODO - ADD A MUX BETWEEN IO AND MEMORY 
+
+        
     PROCESS (clock)BEGIN
         if(rising_edge(Clock)) then
             resetSync <= not reset; 

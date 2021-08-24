@@ -13,6 +13,7 @@ ENTITY IO_top IS
             dataout: OUT STD_LOGIC_VECTOR(31 downto 0));
 END IO_top;
 --------------------------------------------------------------
+--------------------------------------------------------------
 architecture dfl of IO_top is
   component HexGen is
 		port(
@@ -24,7 +25,8 @@ architecture dfl of IO_top is
 	
     component IO_Biderctional IS
         GENERIC (n : INTEGER := 8);
-        PORT (LatchDataIn  : IN STD_LOGIC_VECTOR (7 DOWNTO 0);
+        PORT (
+        LatchDataIn  : IN STD_LOGIC_VECTOR (7 DOWNTO 0);
               MemRead, MemWrite, CSi, clk : IN STD_LOGIC;
               MipsDataBus  : OUT STD_LOGIC_VECTOR(31 downto 0);
               IoDeviceDataIn     : OUT STD_LOGIC_VECTOR(n-1 downto 0));
@@ -41,12 +43,14 @@ architecture dfl of IO_top is
 			  CS: OUT STD_LOGIC_VECTOR(6 downto 0));
 	END component;
 	-----------------------------------------------------------
+    --------------------------------------------------------------
 	SIGNAL Out_SW, Out_LEDG, Out_LEDR, Out_HEX0, Out_HEX1, Out_HEX2, Out_HEX3 : STD_LOGIC_VECTOR (31 DOWNTO 0);
 	SIGNAL CS : STD_LOGIC_VECTOR (6 DOWNTO 0);
 	SIGNAL disp_LEDG,disp_LEDR : STD_LOGIC_VECTOR (7 DOWNTO 0);
 	SIGNAL disp_HEX0,disp_HEX1,disp_HEX2,disp_HEX3 : STD_LOGIC_VECTOR (3 DOWNTO 0);
 	SIGNAL D_adress : STD_LOGIC_VECTOR (3 DOWNTO 0);
 begin
+    
     D_adress <= (3=>address(BUS_W-1),2=>address(4),1=>address(3),0=>address(2)); --FOR QUARTUS!!!
 	--D_adress <= (3=>address(BUS_W-1),2=>address(2),1=>address(1),0=>address(0));
 	
@@ -75,4 +79,5 @@ begin
 	LEDR<=disp_LEDR;
 	
 END dfl;
+
 
