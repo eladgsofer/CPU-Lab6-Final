@@ -45,7 +45,7 @@ BEGIN
     ALUSrc      <=  Lw OR Sw OR I_format;
     MemtoReg    <=  "01" WHEN Lw  = '1' ELSE -- Load Word writes to regs from memory
                     "10" WHEN Jal = '1' ELSE -- jump and link writes to reg 31 from pc+4
-                    "11" WHEN Lui = '1' ELSE -- jump and link writes to reg 31 from pc+4
+                    "11" WHEN Lui = '1' ELSE -- Load upper immediate writes to regs from (immediate << 16)
                     "00";                    -- all others write to regs from alu result
     RegWrite    <=  (R_format AND NOT Jr) OR Lw OR I_format OR Mul OR Jal;
     MemRead     <=  Lw;
