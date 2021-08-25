@@ -80,7 +80,8 @@ begin
 			   Out_HEX1 WHEN CS(3) = '1' ELSE
 			   Out_HEX2 WHEN CS(4) = '1' ELSE
 			   Out_HEX3 WHEN CS(5) = '1' ELSE
-			   out_IFG WHEN CS(7) = '1' ELSE
+			   Out_Buttons WHEN CS(7) = '1' ELSE
+			   out_IFG     WHEN  CS(14) = '1' ELSE
                
 			   X"00000000";
 	Decoder     : Decoder port map(address, CS);

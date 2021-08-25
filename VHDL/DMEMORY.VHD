@@ -15,7 +15,9 @@ ENTITY dmemory IS
             address                : IN     STD_LOGIC_VECTOR( BUS_W-1 DOWNTO 0 );
             write_data             : IN     STD_LOGIC_VECTOR( 31 DOWNTO 0 );
             MemRead, Memwrite      : IN     STD_LOGIC;
-            clock,reset            : IN     STD_LOGIC);
+            clock,reset            : IN     STD_LOGIC;
+            INTR                   : IN     STD_LOGIC;
+            TYPEx                  : IN     STD_LOGIC(ADD_BUS-1 DOWNTO 0));
 END dmemory;
 
 ARCHITECTURE behavior OF dmemory IS
@@ -23,6 +25,7 @@ ARCHITECTURE behavior OF dmemory IS
 SIGNAL write_clock,WriteToMem : STD_LOGIC;
 
 BEGIN
+	SIGNAL address_orType : STD_LOGIC_VECTOR(ADD_BUS-1 DOWNTO 0 );
 
 -- Load memory address register with write clock
     write_clock <= NOT clock;
@@ -30,7 +33,8 @@ BEGIN
     -- No need this... just check if we are at the memory space 
                  
     WriteToMem <='1' when (memwrite ='1' and address(BUS_W-1)='0') else '0';
-    
+    address_orType <= address(ADD_BUS-1 downto 0) when INTR = '0' ELSE TYPEx; -- need to CHANGE for QUARTUS competability
+
     data_memory : altsyncram
     GENERIC MAP  (
         operation_mode         => "SINGLE_PORT",
@@ -44,7 +48,7 @@ BEGIN
     PORT MAP (
         wren_a    => WriteToMem,
         clock0    => write_clock,
-        address_a => address(ADD_BUS-1 downto 0),  -- CHANGE THIS WHEN MOVING TO QUARTUS : address(9 downto 0)
+        address_a => address_orType,  -- CHANGE THIS WHEN MOVING TO QUARTUS : address(9 downto 0)
         data_a    => write_data,
         q_a       => read_data    );
     

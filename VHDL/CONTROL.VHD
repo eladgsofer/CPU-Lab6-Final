@@ -19,7 +19,13 @@ ENTITY control IS
     Jr          : IN    STD_LOGIC;
     ALUop       : OUT   STD_LOGIC_VECTOR( 2 DOWNTO 0 );
     clock       : IN    STD_LOGIC;
-    reset       : IN    STD_LOGIC );
+    reset       : IN    STD_LOGIC; 
+    INTR        : IN    STD_LOGIC;
+    INTA        : OUT   STD_LOGIC;
+    RT		    : IN 	STD_LOGIC_VECTOR( 4 DOWNTO 0 );
+    GIE_ctl		: OUT   STD_LOGIC;
+
+    );
 
 END control;
 
@@ -47,9 +53,9 @@ BEGIN
                     "10" WHEN Jal = '1' ELSE -- jump and link writes to reg 31 from pc+4
                     "11" WHEN Lui = '1' ELSE -- Load upper immediate writes to regs from (immediate << 16)
                     "00";                    -- all others write to regs from alu result
-    RegWrite    <=  (R_format AND NOT Jr) OR Lw OR I_format OR Mul OR Jal;
+    RegWrite    <=  (INTR = '0') AND ((R_format AND NOT Jr) OR Lw OR I_format OR Mul OR Jal);
     MemRead     <=  Lw;
-    MemWrite    <=  Sw; 
+    MemWrite    <=  (INTR = '0') AND Sw; 
     Branch      <=  Beq;
     --ALUOp( 1 )    <=  R_format;
     --ALUOp( 0 )    <=  Beq; 
@@ -68,8 +74,24 @@ BEGIN
 -- 010 : xor  - XORI
 -- 011 : or   - ORI 
 -- 100 : and  - ANDI
--- 101 : mul  - MUL
+-- 101 : mul  - MUL    
 
+    -- Interrupts
+    GIE_ctl	<=  '1'  WHEN RegWrite AND (RT = "11010") ELSE '0' ;
+    
+    PROCESS (clock,reset)
+		BEGIN
+			IF(reset='0') THEN
+				INTA <= '0'; 				
+			ELSIF(clock'EVENT AND clock='1') THEN
+				IF INTR = '1' THEN 	-- one clock after INTR we raise INTA
+					INTA <= '1';
+				ElSIF (R_format='1' and address(5 downto 0)="01000" and (RT = "11010")) THEN -- we reset INTA when it is a jr command and the register is $k1
+					INTA <= '0'; 
+				END IF;
+			END IF;
+	END PROCESS;
+    
    END behavior;
 
 

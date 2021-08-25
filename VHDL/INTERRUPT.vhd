@@ -27,7 +27,7 @@ BEGIN
 	-- GIE, decides if on '1' or '0'
 	PROCESS (reset, clock)
 		BEGIN
-			IF(reset='0') THEN
+			IF(reset='1') THEN
 				GIE <= '0'; 	
 			ELSIF(clock'EVENT AND clock='1') THEN
 				IF GIE_ctl='1' THEN 
@@ -40,7 +40,7 @@ BEGIN
 	--IE, interrupt enable register. used to allow interrupts
 	PROCESS (reset,clock)
 		BEGIN
-			IF(reset='0') THEN
+			IF(reset='1') THEN
 				IE <= "0000"; 
 			ELSIF(clock'EVENT AND clock='0') THEN
 				IF (IE_ctl='1') THEN 
@@ -53,7 +53,7 @@ BEGIN
 	--IFG, store to or load from IFG
 	PROCESS (reset,clock)--,clock)
 		BEGIN
-			IF(reset='0') THEN
+			IF(reset='1') THEN
 				IFG <= "0000";
 			ELSIF(clock'EVENT AND clock='0') THEN -- 0 or 1?	
 				IF (IFG_store_ctl ='1') THEN  -- store to
@@ -69,7 +69,7 @@ BEGIN
 	
 	PROCESS ( GIE, irq0, irq1, irq2, irq3, reset, IFG_store_ctl, INTA, IE, clock )
 		BEGIN
-			IF(reset='0') THEN
+			IF(reset='1') THEN
 					IFG2 <= "0000";
 			--ELSIF (IFG_store_ctl ='1') THEN  -- store to
 			--		IFG2 <= data(3 DOWNTO 0);

@@ -36,25 +36,33 @@ ARCHITECTURE structure OF MIPS IS
                 Jr                  : IN    STD_LOGIC;
                 Zero                : IN    STD_LOGIC;
                 PC_out              : OUT   STD_LOGIC_VECTOR( 9 DOWNTO 0 );
-                clock,reset         : IN    STD_LOGIC );
+                clock,reset         : IN    STD_LOGIC 
+                read_data 		    : IN	STD_LOGIC_VECTOR( 31 DOWNTO 0 );
+                INTR		 		: IN 	STD_LOGIC;
+                INTA		 		: IN 	STD_LOGIC
+                );
     END COMPONENT; 
 
     COMPONENT Idecode
-         PORT(  read_data_1         : OUT   STD_LOGIC_VECTOR( 31 DOWNTO 0 );
-                read_data_2         : OUT   STD_LOGIC_VECTOR( 31 DOWNTO 0 );
-                Instruction         : IN    STD_LOGIC_VECTOR( 31 DOWNTO 0 );
-                read_data           : IN    STD_LOGIC_VECTOR( 31 DOWNTO 0 );
-                ALU_result          : IN    STD_LOGIC_VECTOR( 31 DOWNTO 0 );
-                PC_plus_4           : IN    STD_LOGIC_VECTOR( 9  DOWNTO 0 );
-                RegWrite            : IN    STD_LOGIC;
-                MemtoReg            : IN    STD_LOGIC_VECTOR( 1  DOWNTO 0 );
-                RegDst              : IN    STD_LOGIC_VECTOR( 1  DOWNTO 0 );
-                Sign_extend         : OUT   STD_LOGIC_VECTOR( 31 DOWNTO 0 );
-                clock, reset        : IN    STD_LOGIC );
+         PORT( 
+        read_data_1 : OUT   STD_LOGIC_VECTOR( 31 DOWNTO 0 );
+        read_data_2 : OUT   STD_LOGIC_VECTOR( 31 DOWNTO 0 );
+        Instruction : IN    STD_LOGIC_VECTOR( 31 DOWNTO 0 );
+        read_data   : IN    STD_LOGIC_VECTOR( 31 DOWNTO 0 );
+        ALU_result  : IN    STD_LOGIC_VECTOR( 31 DOWNTO 0 );
+        PC_plus_4   : IN    STD_LOGIC_VECTOR( 9 DOWNTO 0 );
+        RegWrite    : IN    STD_LOGIC;
+        MemtoReg    : IN    STD_LOGIC_VECTOR(1 DOWNTO 0);
+        RegDst      : IN    STD_LOGIC_VECTOR(1 DOWNTO 0);
+        Sign_extend : OUT   STD_LOGIC_VECTOR( 31 DOWNTO 0 );
+        clock,reset : IN    STD_LOGIC;
+        INTR,INTA   : IN    STD_LOGIC;
+        PC          : IN    STD_LOGIC_VECTOR(9 DOWNTO 0)
+    );
     END COMPONENT;
 
     COMPONENT control
-         PORT(  Opcode              : IN    STD_LOGIC_VECTOR( 5 DOWNTO 0 );
+        PORT(  Opcode              : IN    STD_LOGIC_VECTOR( 5 DOWNTO 0 );
                 RegDst              : OUT   STD_LOGIC_VECTOR( 1 DOWNTO 0 );
                 ALUSrc              : OUT   STD_LOGIC;
                 MemtoReg            : OUT   STD_LOGIC_VECTOR( 1 DOWNTO 0 );
@@ -66,7 +74,12 @@ ARCHITECTURE structure OF MIPS IS
                 Jump                : OUT   STD_LOGIC;
                 Jr                  : IN    STD_LOGIC;
                 ALUop               : OUT   STD_LOGIC_VECTOR( 2 DOWNTO 0 );
-                clock, reset        : IN    STD_LOGIC );
+                clock, reset        : IN    STD_LOGIC
+                INTR                : IN    STD_LOGIC;
+                INTA                : OUT   STD_LOGIC;
+                RT		            : IN 	STD_LOGIC_VECTOR( 4 DOWNTO 0 );
+                GIE_ctl		        : OUT   STD_LOGIC;
+        );
     END COMPONENT;
 
     COMPONENT  Execute
@@ -93,7 +106,9 @@ COMPONENT dmemory IS
             address             : IN    STD_LOGIC_VECTOR( BUS_W-1 DOWNTO 0 );
             write_data          : IN    STD_LOGIC_VECTOR( 31 DOWNTO 0 );
             MemRead, Memwrite   : IN    STD_LOGIC;
-            clock,reset         : IN    STD_LOGIC);
+            clock,reset         : IN    STD_LOGIC;
+            INTR                : IN    STD_LOGIC;
+            TYPEx               : IN    STD_LOGIC(ADD_BUS-1 DOWNTO 0));
 END COMPONENT;
 
 COMPONENT IO_top IS
@@ -144,6 +159,7 @@ END COMPONENT;
     SIGNAL INTA             : STD_LOGIC;
     SIGNAL TYPEx            : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL GIE_ctl          : STD_LOGIC;
+    SIGNAL TYPEx_sized      : STD_LOGIC_VECTOR( 9 DOWNTO 0 );
     
     --SIGNAL Switches         : STD_LOGIC_VECTOR( 7 DOWNTO 0 );
 BEGIN
@@ -184,7 +200,10 @@ BEGIN
                 Zero            => Zero,
                 PC_out          => PC,              
                 clock           => clock,  
-                reset           => resetSync );
+                reset           => resetSync
+                read_data		=> read_data,
+				INTR			=> INTR,
+				INTA			=> INTA                );
 
    ID : Idecode
     PORT MAP (  read_data_1     => read_data_1,
@@ -198,8 +217,10 @@ BEGIN
                 RegDst          => RegDst,
                 Sign_extend     => Sign_extend,
                 clock           => clock,  
-                reset           => resetSync );
-
+                reset           => resetSync,
+                INTR            => INTR,
+                INTA            => INTA,
+                PC              =>PC_out);
 
    CTL:   control
     PORT MAP (  Opcode          => Instruction( 31 DOWNTO 26 ),
@@ -215,7 +236,12 @@ BEGIN
                 Jr              => Jr,
                 ALUop           => ALUop,
                 clock           => clock,
-                reset           => resetSync );
+                reset           => resetSync,
+                INTR            => INTR,
+                INTA            => INTA,
+                RT		        => Instruction(26 DOWNTO 16),
+                GIE_ctl		    => GIE_ctl
+    );
 
    EXE:  Execute
     PORT MAP (  Read_data_1     => read_data_1,
@@ -233,7 +259,10 @@ BEGIN
                 PC_plus_4       => PC_plus_4,
                 Clock           => clock,
                 Reset           => resetSync );
-   QUARTUS_MEM : IF QUARTUS = 1 GENERATE
+    
+    TYPEx_sized	<= TYPEx(9 DOWNTO 2) & "00";
+
+    QUARTUS_MEM : IF QUARTUS = 1 GENERATE
        MEM:  dmemory
         GENERIC MAP(BUS_W => BUS_W, 
                     ADD_BUS => ADD_BUS) -- QUARTUS MODE = 12; 10 | MODELSIM = 8; 8
@@ -243,7 +272,9 @@ BEGIN
                     MemRead         => MemRead, 
                     Memwrite        => MemWrite, 
                     clock           => clock,  
-                    reset           => resetSync);
+                    reset           => resetSync,
+                    INTR            => INTR,
+                    TYPEx           => TYPEx_sized);
 
         
        
@@ -259,7 +290,9 @@ BEGIN
                     MemRead         => MemRead, 
                     Memwrite        => MemWrite, 
                     clock           => clock,  
-                    reset           => resetSync);
+                    reset           => resetSync,
+                    INTR            => INTR,
+                    TYPEx           => TYPEx_sized);
                     
        
     END GENERATE;
