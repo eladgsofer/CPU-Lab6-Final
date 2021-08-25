@@ -298,4 +298,3 @@ BEGIN
         end if;   
     END PROCESS;
 END structure;
-
