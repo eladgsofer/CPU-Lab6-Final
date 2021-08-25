@@ -6,7 +6,7 @@ USE IEEE.STD_LOGIC_ARITH.ALL;
 ENTITY MIPS IS
     GENERIC (BUS_W : INTEGER := 12; ADD_BUS: INTEGER :=10; QUARTUS : INTEGER := 1); -- QUARTUS MODE = 12; 10 | MODELSIM = 10; 8
         --GENERIC (BUS_W : INTEGER := 8; ADD_BUS: INTEGER :=8; QUARTUS : INTEGER := 0); -- QUARTUS MODE = 12; 10 | MODELSIM = 10; 8
-    PORT( reset, clock                  : IN    STD_LOGIC; 
+    PORT(clock                  : IN    STD_LOGIC; 
         -- Output important signals to pins for easy display in Simulator
         PC                              : OUT STD_LOGIC_VECTOR( 9 DOWNTO 0 );
         ALU_result_out, read_data_1_out : OUT STD_LOGIC_VECTOR( 31 DOWNTO 0 );
@@ -16,7 +16,10 @@ ENTITY MIPS IS
         Memwrite_out,Regwrite_out       : OUT STD_LOGIC;
         LEDG, LEDR                      : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
         HEX0, HEX1, HEX2, HEX3          : OUT STD_LOGIC_VECTOR (6 DOWNTO 0);
-        SW                              : IN  STD_LOGIC_VECTOR (7 DOWNTO 0));
+        SW                              : IN  STD_LOGIC_VECTOR (7 DOWNTO 0)
+        pushButtons						: IN  STD_LOGIC_VECTOR (3 DOWNTO 0);
+
+        );
 END     MIPS;
 
 ARCHITECTURE structure OF MIPS IS
@@ -94,16 +97,18 @@ COMPONENT dmemory IS
 END COMPONENT;
 
 COMPONENT IO_top IS
-  GENERIC (BUS_W : INTEGER := 8); -- QUARTUS MODE = 12; 10 | MODELSIM = 8; 8
-  
-PORT (    datain : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
-            address : IN STD_LOGIC_VECTOR (BUS_W-1 DOWNTO 0);
-            SW : IN STD_LOGIC_VECTOR (7 DOWNTO 0);
-            clk, MemRead, MemWrite: IN std_logic;
-            
-            LEDG, LEDR : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
-            HEX0, HEX1, HEX2, HEX3 : OUT STD_LOGIC_VECTOR (6 DOWNTO 0);
-            dataout: OUT STD_LOGIC_VECTOR(31 downto 0));
+    GENERIC (BUS_W : INTEGER := 8); -- QUARTUS MODE = 12; 10 | MODELSIM = 8; 8
+    PORT (    
+            datain                 : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+			address                : IN STD_LOGIC_VECTOR (BUS_W-1 DOWNTO 0);
+			SW                     : IN STD_LOGIC_VECTOR (7 DOWNTO 0);
+            pushButtons            : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
+			clk, MemRead, MemWrite : IN std_logic;
+            reset                  : IN std_logic;
+			LEDG, LEDR             : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
+			HEX0, HEX1, HEX2, HEX3 : OUT STD_LOGIC_VECTOR (6 DOWNTO 0);
+            dataout                : OUT STD_LOGIC_VECTOR(31 downto 0)
+    );
 END COMPONENT;
 
                     -- declare signals used to connect VHDL components
@@ -232,22 +237,7 @@ BEGIN
                     Memwrite        => MemWrite, 
                     clock           => clock,  
                     reset           => resetSync);
-       IO: IO_top 
-        GENERIC MAP(BUS_W    => BUS_W)
 
-        PORT MAP (datain   => read_data_2,
-                  address  => addressQuartus,        
-                  SW       => SW,
-                  clk      => write_clock,
-                  MemRead  => MemRead,
-                  MemWrite => Memwrite,
-                  LEDG     => LEDG,
-                  LEDR     => LEDR,
-                  HEX0     => HEX0,
-                  HEX1     => HEX1,
-                  HEX2     => HEX2,
-                  HEX3     => HEX3,
-                  dataout  => readDataIo);
         
        
     END GENERATE;
@@ -264,24 +254,26 @@ BEGIN
                     clock           => clock,  
                     reset           => resetSync);
                     
-        IO: IO_top 
-        GENERIC MAP(BUS_W    => BUS_W)
-
-        PORT MAP (datain   => read_data_2,
-                  address  => ALU_Result (BUS_W+1 DOWNTO 2),        
-                  SW       => SW,
-                  clk      => write_clock,
-                  MemRead  => MemRead,
-                  MemWrite => Memwrite,
-                  LEDG     => LEDG,
-                  LEDR     => LEDR,
-                  HEX0     => HEX0,
-                  HEX1     => HEX1,
-                  HEX2     => HEX2,
-                  HEX3     => HEX3,
-                  dataout  => readDataIo);
+       
     END GENERATE;
     
+    IO: IO_top GENERIC MAP(BUS_W    => BUS_W)
+    PORT MAP (datain      => read_data_2,
+              address     => addressQuartus),        
+              SW          => SW,
+              pushButtons => pushButtons,
+              clk         => write_clock,
+              reset       => resetSync,
+              MemRead     => MemRead,
+              MemWrite    => Memwrite,
+              LEDG        => LEDG,
+              LEDR        => LEDR,
+              HEX0        => HEX0,
+              HEX1        => HEX1,
+              HEX2        => HEX2,
+              HEX3        => HEX3,
+              dataout     => readDataIo
+    );
     
 --    COMPONENT IO_top IS
   --GENERIC (BUS_W : INTEGER := 8); -- QUARTUS MODE = 12; 10 | MODELSIM = 8; 8
@@ -302,7 +294,7 @@ BEGIN
         
     PROCESS (clock)BEGIN
         if(rising_edge(Clock)) then
-            resetSync <= not reset; 
+            resetSync <= not pushButtons(0); 
         end if;   
     END PROCESS;
 END structure;
