@@ -38,21 +38,19 @@ architecture dfl of IO_top is
 			  dataout : OUT STD_LOGIC_VECTOR(31 downto 0));
 	END component;
 	
-	component Decoder4_7 IS
+	component Decoder IS
 		PORT (Address : IN STD_LOGIC_VECTOR (3 DOWNTO 0); 
-			  CS: OUT STD_LOGIC_VECTOR(6 downto 0));
+			  CS: OUT STD_LOGIC_VECTOR(15 downto 0));
 	END component;
 	-----------------------------------------------------------
     --------------------------------------------------------------
 	SIGNAL Out_SW, Out_LEDG, Out_LEDR, Out_HEX0, Out_HEX1, Out_HEX2, Out_HEX3 : STD_LOGIC_VECTOR (31 DOWNTO 0);
-	SIGNAL CS : STD_LOGIC_VECTOR (6 DOWNTO 0);
+	SIGNAL CS : STD_LOGIC_VECTOR (15 DOWNTO 0);
 	SIGNAL disp_LEDG,disp_LEDR : STD_LOGIC_VECTOR (7 DOWNTO 0);
 	SIGNAL disp_HEX0,disp_HEX1,disp_HEX2,disp_HEX3 : STD_LOGIC_VECTOR (3 DOWNTO 0);
-	SIGNAL D_adress : STD_LOGIC_VECTOR (3 DOWNTO 0);
 begin
     
-    D_adress <= (3=>address(BUS_W-1),2=>address(4),1=>address(3),0=>address(2)); --FOR QUARTUS!!!
-	--D_adress <= (3=>address(BUS_W-1),2=>address(2),1=>address(1),0=>address(0));
+    
 	
 	dataout <= Out_SW   WHEN CS(6) = '1' ELSE
 			   Out_LEDG WHEN CS(0) = '1' ELSE
@@ -61,8 +59,9 @@ begin
 			   Out_HEX1 WHEN CS(3) = '1' ELSE
 			   Out_HEX2 WHEN CS(4) = '1' ELSE
 			   Out_HEX3 WHEN CS(5) = '1' ELSE
+               
 			   X"00000000";
-	B1 : Decoder4_7 port map(D_adress, CS);
+	B1 : Decoder port map(address, CS);
 	B2 : IO_ReadOnly port map(SW,MemRead,CS(6),Out_SW);
 	B3 : IO_Biderctional generic map(8) port map(datain(7 DOWNTO 0),MemRead,MemWrite,CS(0),clk,Out_LEDG,disp_LEDG);
 	B4 : IO_Biderctional generic map(8) port map(datain(7 DOWNTO 0),MemRead,MemWrite,CS(1),clk,Out_LEDR,disp_LEDR);
