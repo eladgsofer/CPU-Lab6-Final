@@ -105,8 +105,11 @@ COMPONENT IO_top IS
             pushButtons            : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
 			clk, MemRead, MemWrite : IN std_logic;
             reset                  : IN std_logic;
-			LEDG, LEDR             : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
-			HEX0, HEX1, HEX2, HEX3 : OUT STD_LOGIC_VECTOR (6 DOWNTO 0);
+            GIE_ctl,INTR           : IN std_logic;
+            INTA                   : OUT std_logic;
+            TYPEx                  : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+			LEDG, LEDR             : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+			HEX0, HEX1, HEX2, HEX3 : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
             dataout                : OUT STD_LOGIC_VECTOR(31 downto 0)
     );
 END COMPONENT;
@@ -137,6 +140,10 @@ END COMPONENT;
     SIGNAL resetSync        : STD_LOGIC;
     SIGNAL write_clock      : STD_LOGIC;
     SIGNAL readDataMem, readDataIo : STD_LOGIC_VECTOR(31 downto 0);
+    SIGNAL INTR             : STD_LOGIC;
+    SIGNAL INTA             : STD_LOGIC;
+    SIGNAL TYPEx            : STD_LOGIC_VECTOR(31 DOWNTO 0);
+    SIGNAL GIE_ctl          : STD_LOGIC;
     
     --SIGNAL Switches         : STD_LOGIC_VECTOR( 7 DOWNTO 0 );
 BEGIN
@@ -266,6 +273,10 @@ BEGIN
               reset       => resetSync,
               MemRead     => MemRead,
               MemWrite    => Memwrite,
+              GIE_ctl     => GIE_ctl,
+              INTR        => INTR,
+              INTA        => INTA,
+              TYPEx       => TYPEx,
               LEDG        => LEDG,
               LEDR        => LEDR,
               HEX0        => HEX0,
