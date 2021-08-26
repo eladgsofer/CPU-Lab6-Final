@@ -53,23 +53,25 @@ ARCHITECTURE struct OF MIPS_tb IS
    SIGNAL HEX2  : STD_LOGIC_VECTOR( 6 DOWNTO 0 );
    SIGNAL HEX3  : STD_LOGIC_VECTOR( 6 DOWNTO 0 );
    SIGNAL pushButtons : STD_LOGIC_VECTOR (3 DOWNTO 0);
-
+   SIGNAL mw_U_2pulse : std_logic_vector(2 DOWNTO 0);
 
    -- Component Declarations
-   COMPONENT MIPS IS
-
-		PORT(clock					: IN 	STD_LOGIC; 
-			-- Output important signals to pins for easy display in Simulator
-			PC								: OUT  STD_LOGIC_VECTOR( 9 DOWNTO 0 );
-			ALU_result_out, read_data_1_out, read_data_2_out, write_data_out,	
-			Instruction_out					: OUT 	STD_LOGIC_VECTOR( 31 DOWNTO 0 );
-			Branch_out, Zero_out, Memwrite_out, 
-			Regwrite_out					: OUT 	STD_LOGIC;
-			SW : IN STD_LOGIC_VECTOR (7 DOWNTO 0);
-            pushButtons: IN STD_LOGIC_VECTOR (3 DOWNTO 0);
-			LEDG, LEDR : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
-			HEX0, HEX1, HEX2, HEX3 : OUT STD_LOGIC_VECTOR (6 DOWNTO 0));
-	END 	COMPONENT;
+COMPONENT MIPS IS
+    GENERIC (BUS_W : INTEGER := 10; ADD_BUS: INTEGER :=8; QUARTUS : INTEGER := 0); -- QUARTUS MODE = 12; 10 | MODELSIM = 10; 8
+        --GENERIC (BUS_W : INTEGER := 8; ADD_BUS: INTEGER :=8; QUARTUS : INTEGER := 0); -- QUARTUS MODE = 12; 10 | MODELSIM = 10; 8
+    PORT(clock                  : IN    STD_LOGIC; 
+        -- Output important signals to pins for easy display in Simulator
+        PC                              : OUT STD_LOGIC_VECTOR( 9 DOWNTO 0 );
+        ALU_result_out, read_data_1_out : OUT STD_LOGIC_VECTOR( 31 DOWNTO 0 );
+        read_data_2_out, write_data_out : OUT STD_LOGIC_VECTOR( 31 DOWNTO 0 );
+        Instruction_out                 : OUT STD_LOGIC_VECTOR( 31 DOWNTO 0 );
+        Branch_out, Zero_out            : OUT STD_LOGIC;
+        Memwrite_out,Regwrite_out       : OUT STD_LOGIC;
+        LEDG, LEDR                      : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
+        HEX0, HEX1, HEX2, HEX3          : OUT STD_LOGIC_VECTOR (6 DOWNTO 0);
+        SW                              : IN  STD_LOGIC_VECTOR (7 DOWNTO 0);
+        pushButtons						: IN  STD_LOGIC_VECTOR (3 DOWNTO 0));
+END     COMPONENT;
 	
    COMPONENT MIPS_tester
    PORT (
@@ -87,7 +89,7 @@ ARCHITECTURE struct OF MIPS_tb IS
       reset           : OUT    STD_LOGIC 
    );
    END COMPONENT;
-
+   
    -- Optional embedded configurations
    -- pragma synthesis_off
    FOR ALL : MIPS USE ENTITY work.mips;
@@ -136,6 +138,18 @@ BEGIN
          clock           => clock,
          reset           => pushButtons(0)
       );
+ 
+   pushButtons(3 DOWNTO 1) <= mw_U_2pulse;
+   u_2pulse_proc: PROCESS
+   BEGIN
 
+         mw_U_2pulse <="000";
+		    wait for 200 ns;
+		    mw_U_2pulse <="001";
+		    wait for 200 ns;
+		    mw_U_2pulse <="010";
+		    wait; 
+      WAIT;
+   END PROCESS u_2pulse_proc;
 END struct;
 

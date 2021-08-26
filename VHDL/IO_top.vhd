@@ -8,8 +8,8 @@ ENTITY IO_top IS
 			address : IN STD_LOGIC_VECTOR (11 DOWNTO 0);
 			SW : IN STD_LOGIC_VECTOR (7 DOWNTO 0);
             pushButtons: IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-            GIE_ctl,INTR           : IN std_logic;
-            INTA                   : OUT std_logic;
+            GIE_ctl,INTA           : IN std_logic;
+            INTR                   : OUT std_logic;
             TYPEx                  : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 			clk, reset, MemRead, MemWrite: IN std_logic;
 			LEDG, LEDR : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
@@ -67,8 +67,9 @@ architecture dfl of IO_top is
     END COMPONENT;
 	-----------------------------------------------------------
     --------------------------------------------------------------
-	SIGNAL out_IFG,Out_Buttons Out_SW, Out_LEDG, Out_LEDR, Out_HEX0, Out_HEX1, Out_HEX2, Out_HEX3 : STD_LOGIC_VECTOR (31 DOWNTO 0);
+	SIGNAL out_IFG,Out_Buttons, Out_SW, Out_LEDG, Out_LEDR, Out_HEX0, Out_HEX1, Out_HEX2, Out_HEX3 : STD_LOGIC_VECTOR (31 DOWNTO 0);
 	SIGNAL CS : STD_LOGIC_VECTOR (15 DOWNTO 0);
+	SIGNAL pushButtonsInput : STD_LOGIC_VECTOR(7 DOWNTO 0);
 	SIGNAL disp_LEDG,disp_LEDR : STD_LOGIC_VECTOR (7 DOWNTO 0);
 	SIGNAL disp_HEX0,disp_HEX1,disp_HEX2,disp_HEX3 : STD_LOGIC_VECTOR (3 DOWNTO 0);
     SIGNAL BTIFG: STD_LOGIC;
@@ -91,10 +92,12 @@ begin
          out_IFG  WHEN CS(14) = '1' ELSE
                
 			   X"00000000";
+	 pushButtonsInput<="0000" & pushButtons & "0";
 	B1 : Decoder generic map(12) port map(address, CS);
     
 	B2 : IO_ReadOnly port map(SW,MemRead,CS(6),Out_SW);
-	PushButtons : IO_ReadOnly port map("0000" & pushButtons & "0",MemRead,CS(7),Out_Buttons);
+ 
+	PushButtons_comp : IO_ReadOnly port map(pushButtonsInput,MemRead,CS(7),Out_Buttons);
 
     -- LEDS
 	B3 : IO_Biderctional generic map(8) port map(datain(7 DOWNTO 0),MemRead,MemWrite,CS(0),clk,Out_LEDG,disp_LEDG);
@@ -122,11 +125,11 @@ begin
   );
     
   INTRPT: interrupt PORT MAP (  
-        clock			=> clock,
-        irq0			=> pushButtons(1), --key1
-        irq1			=> pushButtons(2), --key2
-        irq2			=> pushButtons(3), -- key3
-        irq3			=> TODO_not_connected_yet,
+        clock			=> clk,
+        irq0			=> pushButtons(0), --key1
+        irq1			=> pushButtons(1), --key2
+        irq2			=> pushButtons(2), -- key3
+        irq3			=> BTIFG,
         INTA			=> INTA,
         GIE_enable		=> address(2), -- we are connected to address quartus which is ALU_RESULT & "00" and we want the first bit from the alu_result
         reset			=> reset,

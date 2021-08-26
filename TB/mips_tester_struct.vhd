@@ -23,7 +23,9 @@ ENTITY MIPS_tester IS
       read_data_2_out : IN     STD_LOGIC_VECTOR ( 31 DOWNTO 0 );
       write_data_out  : IN     STD_LOGIC_VECTOR ( 31 DOWNTO 0 );
       clock           : OUT    STD_LOGIC;
+      --pushButton      : OUT    STD_LOGIC_VECTOR(2 DOWNTO 0);
       reset           : OUT    STD_LOGIC
+
    );
 
 -- Declarations
@@ -57,7 +59,7 @@ ARCHITECTURE struct OF MIPS_tester IS
 
    -- ModuleWare signal declarations(v1.9) for instance 'U_1' of 'pulse'
    SIGNAL mw_U_1pulse : std_logic :='1';
-
+   
 
 BEGIN
 
@@ -83,6 +85,16 @@ BEGIN
          '1' AFTER 120 ns;
       WAIT;
     END PROCESS u_1pulse_proc;
+
+   --pushButton <= mw_U_2pulse;
+   ---u_2pulse_proc: PROCESS
+   --BEGIN
+   --   mw_U_2pulse <= 
+   --      "000",
+   --      "001" AFTER 2000 ns,
+   --      "000" AFTER 300 ns;
+   --   WAIT;
+   -- END PROCESS u_2pulse_proc;
 
    -- Instance port mappings.
 

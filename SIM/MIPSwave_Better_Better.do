@@ -67,34 +67,46 @@ add wave -noupdate -group Mem_ /mips_tb/U_0/MODELSIM_MEM/MEM/reset
 add wave -noupdate -group Mem_ /mips_tb/U_0/MODELSIM_MEM/MEM/write_clock
 add wave -noupdate -group Mem_ /mips_tb/U_0/MODELSIM_MEM/MEM/WriteToMem
 add wave -noupdate -divider IO
-add wave -noupdate -group GPIO_ -radix hexadecimal /mips_tb/U_0/MODELSIM_MEM/IO/datain
-add wave -noupdate -group GPIO_ -radix hexadecimal /mips_tb/U_0/MODELSIM_MEM/IO/address
-add wave -noupdate -group GPIO_ -radix hexadecimal /mips_tb/U_0/MODELSIM_MEM/IO/SW
-add wave -noupdate -group GPIO_ /mips_tb/U_0/MODELSIM_MEM/IO/clk
-add wave -noupdate -group GPIO_ /mips_tb/U_0/MODELSIM_MEM/IO/MemRead
-add wave -noupdate -group GPIO_ /mips_tb/U_0/MODELSIM_MEM/IO/MemWrite
-add wave -noupdate -group GPIO_ -radix hexadecimal /mips_tb/U_0/MODELSIM_MEM/IO/LEDG
-add wave -noupdate -group GPIO_ -radix hexadecimal /mips_tb/U_0/MODELSIM_MEM/IO/LEDR
-add wave -noupdate -group GPIO_ -radix hexadecimal /mips_tb/U_0/MODELSIM_MEM/IO/HEX0
-add wave -noupdate -group GPIO_ -radix hexadecimal /mips_tb/U_0/MODELSIM_MEM/IO/HEX1
-add wave -noupdate -group GPIO_ -radix hexadecimal /mips_tb/U_0/MODELSIM_MEM/IO/HEX2
-add wave -noupdate -group GPIO_ -radix hexadecimal /mips_tb/U_0/MODELSIM_MEM/IO/HEX3
-add wave -noupdate -group GPIO_ -radix hexadecimal /mips_tb/U_0/MODELSIM_MEM/IO/dataout
-add wave -noupdate -group GPIO_ -radix hexadecimal /mips_tb/U_0/MODELSIM_MEM/IO/Out_SW
-add wave -noupdate -group GPIO_ -radix hexadecimal /mips_tb/U_0/MODELSIM_MEM/IO/Out_LEDG
-add wave -noupdate -group GPIO_ -radix hexadecimal /mips_tb/U_0/MODELSIM_MEM/IO/Out_LEDR
-add wave -noupdate -group GPIO_ -radix hexadecimal /mips_tb/U_0/MODELSIM_MEM/IO/Out_HEX0
-add wave -noupdate -group GPIO_ -radix hexadecimal /mips_tb/U_0/MODELSIM_MEM/IO/Out_HEX1
-add wave -noupdate -group GPIO_ -radix hexadecimal /mips_tb/U_0/MODELSIM_MEM/IO/Out_HEX2
-add wave -noupdate -group GPIO_ -radix hexadecimal /mips_tb/U_0/MODELSIM_MEM/IO/Out_HEX3
-add wave -noupdate -group GPIO_ /mips_tb/U_0/MODELSIM_MEM/IO/CS
-add wave -noupdate -group GPIO_ /mips_tb/U_0/MODELSIM_MEM/IO/disp_LEDG
-add wave -noupdate -group GPIO_ /mips_tb/U_0/MODELSIM_MEM/IO/disp_LEDR
-add wave -noupdate -group GPIO_ /mips_tb/U_0/MODELSIM_MEM/IO/disp_HEX0
-add wave -noupdate -group GPIO_ /mips_tb/U_0/MODELSIM_MEM/IO/disp_HEX1
-add wave -noupdate -group GPIO_ /mips_tb/U_0/MODELSIM_MEM/IO/disp_HEX2
-add wave -noupdate -group GPIO_ /mips_tb/U_0/MODELSIM_MEM/IO/disp_HEX3
-add wave -noupdate -group GPIO_ /mips_tb/U_0/MODELSIM_MEM/IO/D_adress
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/datain
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/address
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/SW
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/pushButtons
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/GIE_ctl
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/INTA
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/INTR
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/TYPEx
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/clk
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/reset
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/MemRead
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/MemWrite
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/LEDG
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/LEDR
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/HEX0
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/HEX1
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/HEX2
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/HEX3
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/dataout
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/out_IFG
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/Out_Buttons
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/Out_SW
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/Out_LEDG
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/Out_LEDR
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/Out_HEX0
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/Out_HEX1
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/Out_HEX2
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/Out_HEX3
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/CS
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/pushButtonsInput
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/disp_LEDG
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/disp_LEDR
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/disp_HEX0
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/disp_HEX1
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/disp_HEX2
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/disp_HEX3
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/BTIFG
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/TODO_not_connected_yet
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/ifg_write
+add wave -noupdate -group GPIO /mips_tb/U_0/IO/ifg_read
 add wave -noupdate -divider {Control Signals}
 add wave -noupdate -group _Control -radix hexadecimal /mips_tb/U_0/CTL/Opcode
 add wave -noupdate -group _Control -radix hexadecimal /mips_tb/U_0/CTL/RegDst
@@ -113,7 +125,7 @@ add wave -noupdate -group _Control -radix hexadecimal /mips_tb/U_0/CTL/Lw
 add wave -noupdate -group _Control -radix hexadecimal /mips_tb/U_0/CTL/Sw
 add wave -noupdate -group _Control -radix hexadecimal /mips_tb/U_0/CTL/Beq
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {3484829 ps} 0}
+WaveRestoreCursors {{Cursor 1} {515351 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 264
 configure wave -valuecolwidth 89
@@ -129,4 +141,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ps} {7257856 ps}
+WaveRestoreZoom {0 ps} {907232 ps}

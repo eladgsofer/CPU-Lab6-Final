@@ -17,15 +17,15 @@ ENTITY dmemory IS
             MemRead, Memwrite      : IN     STD_LOGIC;
             clock,reset            : IN     STD_LOGIC;
             INTR                   : IN     STD_LOGIC;
-            TYPEx                  : IN     STD_LOGIC(ADD_BUS-1 DOWNTO 0));
+            TYPEx                  : IN     STD_LOGIC_VECTOR(ADD_BUS-1 DOWNTO 0));
 END dmemory;
 
 ARCHITECTURE behavior OF dmemory IS
 
 SIGNAL write_clock,WriteToMem : STD_LOGIC;
-
+SIGNAL address_orType : STD_LOGIC_VECTOR(ADD_BUS-1 DOWNTO 0 );
 BEGIN
-	SIGNAL address_orType : STD_LOGIC_VECTOR(ADD_BUS-1 DOWNTO 0 );
+
 
 -- Load memory address register with write clock
     write_clock <= NOT clock;
