@@ -4,7 +4,7 @@ USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.STD_LOGIC_ARITH.ALL;
 
 ENTITY MIPS IS
-    GENERIC (BUS_W : INTEGER := 12; ADD_BUS: INTEGER :=10; QUARTUS : INTEGER := 1); -- QUARTUS MODE = 12; 10 | MODELSIM = 10; 8
+    GENERIC (BUS_W : INTEGER := 10; ADD_BUS: INTEGER :=8; QUARTUS : INTEGER := 0); -- QUARTUS MODE = 12; 10 | MODELSIM = 10; 8
         --GENERIC (BUS_W : INTEGER := 8; ADD_BUS: INTEGER :=8; QUARTUS : INTEGER := 0); -- QUARTUS MODE = 12; 10 | MODELSIM = 10; 8
     PORT(clock                  : IN    STD_LOGIC; 
         -- Output important signals to pins for easy display in Simulator
@@ -16,10 +16,8 @@ ENTITY MIPS IS
         Memwrite_out,Regwrite_out       : OUT STD_LOGIC;
         LEDG, LEDR                      : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
         HEX0, HEX1, HEX2, HEX3          : OUT STD_LOGIC_VECTOR (6 DOWNTO 0);
-        SW                              : IN  STD_LOGIC_VECTOR (7 DOWNTO 0)
-        pushButtons						: IN  STD_LOGIC_VECTOR (3 DOWNTO 0);
-
-        );
+        SW                              : IN  STD_LOGIC_VECTOR (7 DOWNTO 0);
+        pushButtons						: IN  STD_LOGIC_VECTOR (3 DOWNTO 0));
 END     MIPS;
 
 ARCHITECTURE structure OF MIPS IS
@@ -133,7 +131,7 @@ END COMPONENT;
     SIGNAL MemRead          : STD_LOGIC;
     SIGNAL ALUop            : STD_LOGIC_VECTOR(  2 DOWNTO 0 );
     SIGNAL Instruction      : STD_LOGIC_VECTOR( 31 DOWNTO 0 );
-    SIGNAL addressQuartus   : STD_LOGIC_VECTOR( BUS_W-1 DOWNTO 0 );
+    SIGNAL addressQuartus   : STD_LOGIC_VECTOR( 11 DOWNTO 0 );
     SIGNAL resetSync        : STD_LOGIC;
     SIGNAL write_clock      : STD_LOGIC;
     SIGNAL readDataMem, readDataIo : STD_LOGIC_VECTOR(31 downto 0);
@@ -154,7 +152,7 @@ BEGIN
    Zero_out         <= Zero;
    RegWrite_out     <= RegWrite;
    MemWrite_out     <= MemWrite;    
-   addressQuartus   <= ALU_Result(BUS_W-1 DOWNTO 2) & "00"; 
+   addressQuartus   <= ALU_Result(11 DOWNTO 2) & "00"; 
 
    read_data <= readDataIo WHEN ALU_result(BUS_W-1) = '1' ELSE readDataMem;  
    write_clock <= NOT clock;
@@ -239,7 +237,6 @@ BEGIN
                     reset           => resetSync);
 
         
-       
     END GENERATE;
     
     MODELSIM_MEM : IF QUARTUS = 0 GENERATE
@@ -259,7 +256,7 @@ BEGIN
     
     IO: IO_top GENERIC MAP(BUS_W    => BUS_W)
     PORT MAP (datain      => read_data_2,
-              address     => addressQuartus),        
+              address     => addressQuartus,        
               SW          => SW,
               pushButtons => pushButtons,
               clk         => write_clock,

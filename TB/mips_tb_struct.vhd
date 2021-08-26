@@ -52,12 +52,13 @@ ARCHITECTURE struct OF MIPS_tb IS
    SIGNAL HEX1  : STD_LOGIC_VECTOR( 6 DOWNTO 0 );
    SIGNAL HEX2  : STD_LOGIC_VECTOR( 6 DOWNTO 0 );
    SIGNAL HEX3  : STD_LOGIC_VECTOR( 6 DOWNTO 0 );
+   SIGNAL pushButtons : STD_LOGIC_VECTOR (3 DOWNTO 0);
 
 
    -- Component Declarations
    COMPONENT MIPS IS
 
-		PORT( reset, clock					: IN 	STD_LOGIC; 
+		PORT(clock					: IN 	STD_LOGIC; 
 			-- Output important signals to pins for easy display in Simulator
 			PC								: OUT  STD_LOGIC_VECTOR( 9 DOWNTO 0 );
 			ALU_result_out, read_data_1_out, read_data_2_out, write_data_out,	
@@ -65,6 +66,7 @@ ARCHITECTURE struct OF MIPS_tb IS
 			Branch_out, Zero_out, Memwrite_out, 
 			Regwrite_out					: OUT 	STD_LOGIC;
 			SW : IN STD_LOGIC_VECTOR (7 DOWNTO 0);
+            pushButtons: IN STD_LOGIC_VECTOR (3 DOWNTO 0);
 			LEDG, LEDR : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
 			HEX0, HEX1, HEX2, HEX3 : OUT STD_LOGIC_VECTOR (6 DOWNTO 0));
 	END 	COMPONENT;
@@ -98,7 +100,7 @@ BEGIN
    -- Instance port mappings.
    U_0 : MIPS
       PORT MAP (
-         reset           => reset,
+         
          clock           => clock,
          PC              => PC,
          ALU_result_out  => ALU_result_out,
@@ -116,7 +118,8 @@ BEGIN
          HEX0 => HEX0,
          HEX1      => HEX1,
          HEX2        => HEX2,
-         HEX3    => HEX3
+         HEX3    => HEX3,
+         pushButtons =>  pushButtons
       );
    U_1 : MIPS_tester
       PORT MAP (
@@ -131,7 +134,7 @@ BEGIN
          read_data_2_out => read_data_2_out,
          write_data_out  => write_data_out,
          clock           => clock,
-         reset           => reset
+         reset           => pushButtons(0)
       );
 
 END struct;

@@ -72,14 +72,14 @@ BEGIN
 	--counter for timer
 	PROCESS (BTSSEL_mux, BTIFG, BTCNT_ctl)
 		BEGIN
-			IF (reset = '0') THEN
+			IF (reset = '1') THEN
 				counter <= x"00000000";
 			ELSIF (BTIFG='1') THEN
 				counter <= (others => '0');
 			ELSIF (BTSSEL_mux'EVENT AND BTSSEL_mux = '1') THEN	
 				IF(BTCNT_ctl='0') THEN
 					IF (BTHOLD = '0') THEN
-						counter <= counter+1;
+						counter <= counter + 1;
 					END IF;
 				ELSE
 					counter <= data;

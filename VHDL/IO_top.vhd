@@ -5,9 +5,10 @@ USE ieee.std_logic_1164.all;
 ENTITY IO_top IS
   GENERIC (BUS_W : INTEGER := 8); -- QUARTUS MODE = 12; | MODELSIM = 8;
   PORT (    datain : IN STD_LOGIC_VECTOR (31 DOWNTO 0);
-			address : IN STD_LOGIC_VECTOR (BUS_W-1 DOWNTO 0);
+			address : IN STD_LOGIC_VECTOR (11 DOWNTO 0);
 			SW : IN STD_LOGIC_VECTOR (7 DOWNTO 0);
-			clk, MemRead, MemWrite: IN std_logic;
+            pushButtons: IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+			clk, reset, MemRead, MemWrite: IN std_logic;
 			LEDG, LEDR : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
 			HEX0, HEX1, HEX2, HEX3 : OUT STD_LOGIC_VECTOR (6 DOWNTO 0);
             dataout: OUT STD_LOGIC_VECTOR(31 downto 0));
@@ -39,9 +40,19 @@ architecture dfl of IO_top is
 	END component;
 	
 	component Decoder IS
-		PORT (Address : IN STD_LOGIC_VECTOR (3 DOWNTO 0); 
-			  CS: OUT STD_LOGIC_VECTOR(15 downto 0));
-	END component;
+    GENERIC (BUS_W : INTEGER := 8); -- QUARTUS MODE = 12; | MODELSIM = 8;
+	PORT (Address : IN STD_LOGIC_VECTOR (BUS_W-1 DOWNTO 0);
+		  CS: OUT STD_LOGIC_VECTOR(15 downto 0));
+    END component;
+    
+    COMPONENT timer 
+		 PORT( 	clock,reset					: IN 	STD_LOGIC;
+				data						: IN	STD_LOGIC_VECTOR( 31 DOWNTO 0 );
+				BTCTL_ctl, BTCNT_ctl 		: IN 	STD_LOGIC;
+				BTIFG_OUT 		 				: OUT 	STD_LOGIC
+			);
+	END COMPONENT;
+    
 	-----------------------------------------------------------
     --------------------------------------------------------------
 	SIGNAL Out_SW, Out_LEDG, Out_LEDR, Out_HEX0, Out_HEX1, Out_HEX2, Out_HEX3 : STD_LOGIC_VECTOR (31 DOWNTO 0);
@@ -63,7 +74,7 @@ begin
                Out_SW   WHEN CS(6) = '1' ELSE
                
 			   X"00000000";
-	B1 : Decoder port map(address, CS);
+	B1 : Decoder generic map(12) port map(address, CS);
     
 	B2 : IO_ReadOnly port map(SW,MemRead,CS(6),Out_SW);
     
@@ -87,8 +98,8 @@ begin
     
     -- Basic Timer
 	BT : timer
-	PORT MAP (clock => clock, reset => reset, data=> datain(7 DOWNTO 0),
-				BTCTL_ctl => CS(11), BTCNT_ctl => BTCNT_ctl(12),
+	PORT MAP (clock => clk, reset => reset, data=> datain,
+				BTCTL_ctl => CS(11), BTCNT_ctl => CS(12),
 				BTIFG_OUT => BTIFG);
                 
 END dfl;
