@@ -5,17 +5,21 @@ USE IEEE.STD_LOGIC_ARITH.ALL;
 USE IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 ENTITY Idecode IS
-      PORT( read_data_1 : OUT   STD_LOGIC_VECTOR( 31 DOWNTO 0 );
-            read_data_2 : OUT   STD_LOGIC_VECTOR( 31 DOWNTO 0 );
-            Instruction : IN    STD_LOGIC_VECTOR( 31 DOWNTO 0 );
-            read_data   : IN    STD_LOGIC_VECTOR( 31 DOWNTO 0 );
-            ALU_result  : IN    STD_LOGIC_VECTOR( 31 DOWNTO 0 );
-            PC_plus_4   : IN    STD_LOGIC_VECTOR( 9 DOWNTO 0 );
-            RegWrite    : IN    STD_LOGIC;
-            MemtoReg    : IN    STD_LOGIC_VECTOR(1 DOWNTO 0);
-            RegDst      : IN    STD_LOGIC_VECTOR(1 DOWNTO 0);
-            Sign_extend : OUT   STD_LOGIC_VECTOR( 31 DOWNTO 0 );
-            clock,reset : IN    STD_LOGIC );
+    PORT( 
+        read_data_1 : OUT   STD_LOGIC_VECTOR( 31 DOWNTO 0 );
+        read_data_2 : OUT   STD_LOGIC_VECTOR( 31 DOWNTO 0 );
+        Instruction : IN    STD_LOGIC_VECTOR( 31 DOWNTO 0 );
+        read_data   : IN    STD_LOGIC_VECTOR( 31 DOWNTO 0 );
+        ALU_result  : IN    STD_LOGIC_VECTOR( 31 DOWNTO 0 );
+        PC_plus_4   : IN    STD_LOGIC_VECTOR( 9 DOWNTO 0 );
+        RegWrite    : IN    STD_LOGIC;
+        MemtoReg    : IN    STD_LOGIC_VECTOR(1 DOWNTO 0);
+        RegDst      : IN    STD_LOGIC_VECTOR(1 DOWNTO 0);
+        Sign_extend : OUT   STD_LOGIC_VECTOR( 31 DOWNTO 0 );
+        clock,reset : IN    STD_LOGIC;
+        INTR,INTA   : IN    STD_LOGIC;
+        PC          : IN    STD_LOGIC_VECTOR(9 DOWNTO 0)
+    );
 END Idecode;
 
 
@@ -74,6 +78,10 @@ PROCESS
         ELSIF RegWrite = '1' AND write_register_address /= 0 THEN
               register_array( CONV_INTEGER( write_register_address)) <= write_data;
         END IF;
+        
+		IF INTR = '1' and INTA = '0' THEN
+            register_array(27) <= (X"000000" & PC(9 downto 2));
+		END IF;
     END PROCESS;
 END behavior;
 
