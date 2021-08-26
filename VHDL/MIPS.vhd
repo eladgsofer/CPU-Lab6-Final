@@ -4,7 +4,7 @@ USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.STD_LOGIC_ARITH.ALL;
 
 ENTITY MIPS IS
-    GENERIC (BUS_W : INTEGER := 10; ADD_BUS: INTEGER :=8; QUARTUS : INTEGER := 0); -- QUARTUS MODE = 12; 10 | MODELSIM = 10; 8
+    GENERIC (BUS_W : INTEGER := 12; ADD_BUS: INTEGER :=10; QUARTUS : INTEGER := 1); -- QUARTUS MODE = 12; 10 | MODELSIM = 10; 8
         --GENERIC (BUS_W : INTEGER := 8; ADD_BUS: INTEGER :=8; QUARTUS : INTEGER := 0); -- QUARTUS MODE = 12; 10 | MODELSIM = 10; 8
     PORT(clock                  : IN    STD_LOGIC; 
         -- Output important signals to pins for easy display in Simulator
@@ -55,7 +55,9 @@ ARCHITECTURE structure OF MIPS IS
         Sign_extend : OUT   STD_LOGIC_VECTOR( 31 DOWNTO 0 );
         clock,reset : IN    STD_LOGIC;
         INTR,INTA   : IN    STD_LOGIC;
-        PC          : IN    STD_LOGIC_VECTOR(9 DOWNTO 0)
+        PC          : IN    STD_LOGIC_VECTOR(9 DOWNTO 0);
+        Is_k1       : OUT   STD_LOGIC
+
     );
     END COMPONENT;
 
@@ -74,9 +76,11 @@ ARCHITECTURE structure OF MIPS IS
                 ALUop               : OUT   STD_LOGIC_VECTOR( 2 DOWNTO 0 );
                 clock, reset        : IN    STD_LOGIC;
                 INTR                : IN    STD_LOGIC;
-                INTA                : OUT   STD_LOGIC;
+                INTA                : BUFFER   STD_LOGIC;
                 RT		                : IN 	STD_LOGIC_VECTOR( 4 DOWNTO 0 );
-                GIE_ctl		           : OUT   STD_LOGIC
+                GIE_ctl		           : OUT   STD_LOGIC;
+                Is_k1               : IN   STD_LOGIC
+
         );
     END COMPONENT;
 
@@ -151,14 +155,13 @@ END COMPONENT;
     SIGNAL Instruction      : STD_LOGIC_VECTOR( 31 DOWNTO 0 );
     SIGNAL addressQuartus   : STD_LOGIC_VECTOR( 11 DOWNTO 0 );
     SIGNAL resetSync        : STD_LOGIC;
-    SIGNAL write_clock      : STD_LOGIC;
     SIGNAL readDataMem, readDataIo : STD_LOGIC_VECTOR(31 downto 0);
     SIGNAL INTR             : STD_LOGIC;
     SIGNAL INTA             : STD_LOGIC;
     SIGNAL TYPEx            : STD_LOGIC_VECTOR(31 DOWNTO 0);
     SIGNAL GIE_ctl          : STD_LOGIC;
    	SIGNAL PC_OUT 			: STD_LOGIC_VECTOR( 9 DOWNTO 0 );
-
+    SIGNAL is_k1            : STD_LOGIC;
     
     --SIGNAL Switches         : STD_LOGIC_VECTOR( 7 DOWNTO 0 );
 BEGIN
@@ -176,10 +179,10 @@ BEGIN
    Zero_out         <= Zero;
    RegWrite_out     <= RegWrite;
    MemWrite_out     <= MemWrite;    
-   addressQuartus   <= ALU_Result(11 DOWNTO 2) & "00"; 
+   addressQuartus   <= ALU_Result(11 DOWNTO 2) & "00";
+   PC           <= PC_OUT;
 
    read_data <= readDataIo WHEN ALU_result(BUS_W-1) = '1' ELSE readDataMem;  
-   write_clock <= NOT clock;
    --Switches         <= SW & reset;
  --address          <= ALU_Result(11 DOWNTO 2) & "00"; 
  
@@ -197,7 +200,7 @@ BEGIN
                 Jump            => Jump,
                 Jr              => Jr,
                 Zero            => Zero,
-                PC_out          => PC,              
+                PC_out          => PC_OUT,              
                 clock           => clock,  
                 reset           => resetSync,
                 read_data		     => read_data,
@@ -219,7 +222,8 @@ BEGIN
                 reset           => resetSync,
                 INTR            => INTR,
                 INTA            => INTA,
-                PC              =>PC_out);
+                PC              =>PC_out,
+                is_k1           => is_k1);
 
    CTL:   control
     PORT MAP (  Opcode          => Instruction( 31 DOWNTO 26 ),
@@ -239,7 +243,8 @@ BEGIN
                 INTR            => INTR,
                 INTA            => INTA,
                 RT		        => Instruction(20 DOWNTO 16),
-                GIE_ctl		    => GIE_ctl
+                GIE_ctl		    => GIE_ctl,
+                is_k1           => is_k1
     );
 
    EXE:  Execute
@@ -297,10 +302,10 @@ BEGIN
     
     IO: IO_top GENERIC MAP(BUS_W    => BUS_W)
     PORT MAP (datain      => read_data_2,
-              address     => addressQuartus,        
+              address     => ALU_Result(11 DOWNTO 0),        
               SW          => SW,
               pushButtons => pushButtons(3 DOWNTO 1),
-              clk         => write_clock,
+              clk         => clock,
               reset       => resetSync,
               MemRead     => MemRead,
               MemWrite    => Memwrite,

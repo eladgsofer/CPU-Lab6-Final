@@ -143,11 +143,11 @@ BEGIN
    u_2pulse_proc: PROCESS
    BEGIN
 
-         mw_U_2pulse <="000";
-		    wait for 200 ns;
-		    mw_U_2pulse <="001";
-		    wait for 200 ns;
-		    mw_U_2pulse <="010";
+         mw_U_2pulse <="111";
+		    wait for 2000 ns;
+		    mw_U_2pulse <="110";
+		    wait for 2000 ns;
+		    mw_U_2pulse <="111";
 		    wait; 
       WAIT;
    END PROCESS u_2pulse_proc;

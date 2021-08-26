@@ -57,7 +57,7 @@ architecture dfl of IO_top is
 	END COMPONENT;
     COMPONENT Interrupt IS
        PORT( 	
-            clock,irq0,irq1,irq2,irq3,INTA,GIE_enable,reset	: IN 	STD_LOGIC;
+            clock,irq0,irq1,irq2,irq3,irq4,irq5,INTA,GIE_enable,reset	: IN 	STD_LOGIC;
             data							                : IN	STD_LOGIC_VECTOR( 31 DOWNTO 0 );
             GIE_ctl,IFG_store_ctl,IFG_load_ctl,IE_ctl       : IN 	STD_LOGIC;
             INTR							                : OUT 	STD_LOGIC;
@@ -75,8 +75,11 @@ architecture dfl of IO_top is
     SIGNAL BTIFG: STD_LOGIC;
     SIGNAL TODO_not_connected_yet : STD_LOGIC;
     SIGNAL ifg_write, ifg_read    : STD_LOGIC;
+    SIGNAL write_clock      : STD_LOGIC;
+
 begin
-    
+    write_clock <= NOT clk;
+
     ifg_read  <= CS(14) AND MemRead;
     ifg_write <= CS(14) AND MemWrite;
 	
@@ -100,16 +103,16 @@ begin
 	PushButtons_comp : IO_ReadOnly port map(pushButtonsInput,MemRead,CS(7),Out_Buttons);
 
     -- LEDS
-	B3 : IO_Biderctional generic map(8) port map(datain(7 DOWNTO 0),MemRead,MemWrite,CS(0),clk,Out_LEDG,disp_LEDG);
-	B4 : IO_Biderctional generic map(8) port map(datain(7 DOWNTO 0),MemRead,MemWrite,CS(1),clk,Out_LEDR,disp_LEDR);
+	B3 : IO_Biderctional generic map(8) port map(datain(7 DOWNTO 0),MemRead,MemWrite,CS(0),write_clock,Out_LEDG,disp_LEDG);
+	B4 : IO_Biderctional generic map(8) port map(datain(7 DOWNTO 0),MemRead,MemWrite,CS(1),write_clock,Out_LEDR,disp_LEDR);
     LEDG<=disp_LEDG;
 	LEDR<=disp_LEDR;
     
     -- HEX LCD
-	B5 : IO_Biderctional generic map(4) port map(datain(7 DOWNTO 0),MemRead,MemWrite,CS(2),clk,Out_HEX0,disp_HEX0);
-	B6 : IO_Biderctional generic map(4) port map(datain(7 DOWNTO 0),MemRead,MemWrite,CS(3),clk,Out_HEX1,disp_HEX1);
-	B7 : IO_Biderctional generic map(4) port map(datain(7 DOWNTO 0),MemRead,MemWrite,CS(4),clk,Out_HEX2,disp_HEX2);
-	B8 : IO_Biderctional generic map(4) port map(datain(7 DOWNTO 0),MemRead,MemWrite,CS(5),clk,Out_HEX3,disp_HEX3);
+	B5 : IO_Biderctional generic map(4) port map(datain(7 DOWNTO 0),MemRead,MemWrite,CS(2),write_clock,Out_HEX0,disp_HEX0);
+	B6 : IO_Biderctional generic map(4) port map(datain(7 DOWNTO 0),MemRead,MemWrite,CS(3),write_clock,Out_HEX1,disp_HEX1);
+	B7 : IO_Biderctional generic map(4) port map(datain(7 DOWNTO 0),MemRead,MemWrite,CS(4),write_clock,Out_HEX2,disp_HEX2);
+	B8 : IO_Biderctional generic map(4) port map(datain(7 DOWNTO 0),MemRead,MemWrite,CS(5),write_clock,Out_HEX3,disp_HEX3);
     
     -- Hex Signal Generators
     H0 : HexGen port map(HexIn=>disp_HEX0,HexOut=>HEX0);
@@ -119,19 +122,21 @@ begin
     
     -- Basic Timer
 	BT : timer
-	PORT MAP (clock => clk, reset => reset, data=> datain,
+	PORT MAP (clock => write_clock, reset => reset, data=> datain,
 				BTCTL_ctl => CS(11), BTCNT_ctl => CS(12),
 				BTIFG_OUT => BTIFG
   );
     
   INTRPT: interrupt PORT MAP (  
         clock			=> clk,
-        irq0			=> pushButtons(0), --key1
-        irq1			=> pushButtons(1), --key2
-        irq2			=> pushButtons(2), -- key3
-        irq3			=> BTIFG,
+        irq0			=> TODO_not_connected_yet, 
+        irq1			=> TODO_not_connected_yet, 
+        irq2			=> BTIFG, 
+        irq3			=> pushButtons(0),
+        irq4			=> pushButtons(1),
+        irq5			=> pushButtons(2),
         INTA			=> INTA,
-        GIE_enable		=> address(2), -- we are connected to address quartus which is ALU_RESULT & "00" and we want the first bit from the alu_result
+        GIE_enable		=> address(0),
         reset			=> reset,
         data			=> datain,
         GIE_ctl			=> GIE_ctl,
