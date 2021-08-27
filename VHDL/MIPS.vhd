@@ -76,7 +76,7 @@ ARCHITECTURE structure OF MIPS IS
                 ALUop               : OUT   STD_LOGIC_VECTOR( 2 DOWNTO 0 );
                 clock, reset        : IN    STD_LOGIC;
                 INTR                : IN    STD_LOGIC;
-                INTA                : BUFFER   STD_LOGIC;
+                INTA                : OUT   STD_LOGIC;
                 RT		                : IN 	STD_LOGIC_VECTOR( 4 DOWNTO 0 );
                 GIE_ctl		           : OUT   STD_LOGIC;
                 Is_k1               : IN   STD_LOGIC
