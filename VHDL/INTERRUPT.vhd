@@ -21,7 +21,8 @@ ARCHITECTURE behavior OF interrupt IS
     SIGNAL  GIE             : STD_LOGIC; 
     SIGNAL  IE              : STD_LOGIC_VECTOR( 5 DOWNTO 0 );
     SIGNAL  IFG,IFG2            : STD_LOGIC_VECTOR( 5 DOWNTO 0 );
-
+    SIGNAL  SERVICED            : STD_LOGIC_VECTOR(2 DOWNTO 0); -- FOR AUTOMATICALLY IFG TURNOFF
+    SIGNAL  INTA_STATE          : STD_LOGIC;
 
 BEGIN  
     -- GIE, decides if on '1' or '0'
@@ -35,7 +36,7 @@ BEGIN
                 END IF;
             END IF;
     END PROCESS;
-
+            
    
     --IE, interrupt enable register. used to allow interrupts
     PROCESS (reset,clock)
@@ -60,8 +61,31 @@ BEGIN
                     IFG <= data(5 DOWNTO 0);        
                 ELSIF (IFG_load_ctl='1') THEN  -- load from
                     out_IFG <= X"000000" & "00" &IFG(5 downto 0);
+                -- Automatically turn off the IFG when an interrupt finished it's ISR    
+                ELSIF (INTA_STATE = '1') THEN
+                    IF (SERVICED(0)='1') THEN 
+                        IFG(0) <= '0';
+                    ELSIF (SERVICED(1)='1') THEN 
+                        IFG(1) <= '0';                    
+                    ELSE 
+                        IFG(2) <= '0';
+                    END IF;
                 ELSE IFG <= IFG2;               
                 END IF; 
+            END IF; 
+        END PROCESS;
+        
+    --Mark the falling edge of INTA
+    PROCESS (reset,clock, INTA)--,clock)
+        BEGIN
+            IF(reset='1') THEN
+                INTA_STATE <='0';
+            ELSIF((clock'EVENT AND clock='1') AND (INTA'EVENT AND INTA='0')) THEN
+                if  THEN                
+                    INTA_STATE <='1';
+                ELSE
+                    INTA_STATE <= '0';
+                END IF;
             END IF; 
         END PROCESS;
         
@@ -76,6 +100,18 @@ BEGIN
             ELSIF (clock'EVENT AND clock='0') THEN
                 IF (IFG_store_ctl ='1') THEN  -- store to
                     IFG2 <= data(5 DOWNTO 0);
+                    
+                -- Automatically turn off the IFG when an interrupt finished it's ISR    
+                ELSIF (INTA_STATE = '1') THEN
+                    IF (SERVICED(0)='1') THEN 
+                        IFG2(0) <= '0';
+                    ELSIF (SERVICED(1)='1') THEN 
+                        IFG2(1) <= '0';                    
+                    ELSE 
+                        IFG2(2) <= '0';
+                    END IF;
+                    
+                    
                 ELSIF (GIE = '1' AND INTA ='0') THEN
                     IF (irq0='1' AND IE(0) = '1')  THEN --Uart Rx
                         IFG2 (0) <= '1';
@@ -112,12 +148,15 @@ BEGIN
                     IF    IE(0) = '1' AND IFG (0) = '1' THEN --Uart Rx
                         TYPEx <= X"000000" & "00001000"; -- "0x08" 
                         INTR    <= '1';
+                        SERVICED <= "001";
                     elsif     IE(1) = '1' AND IFG (1) = '1' THEN --Uart Tx
                         TYPEx <= X"000000" & "00001100"; -- "0x0C" 
                         INTR    <= '1';
+                        SERVICED <= "010";
                     elsif     IE(2) = '1' AND IFG (2) = '1' THEN --BTIFG
                         TYPEx <= X"000000" & "00010000"; -- "0x10" 
                         INTR    <= '1';
+                        SERVICED <= "100";
                     elsif IE(3) = '1' AND   IFG(3) = '1' THEN --Key1IFG     
                         TYPEx <= X"000000" & "00010100"; -- "0x14" 
                         INTR    <= '1';

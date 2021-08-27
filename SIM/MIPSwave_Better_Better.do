@@ -45,7 +45,7 @@ add wave -noupdate -group Decode_ /mips_tb/U_0/ID/reset
 add wave -noupdate -group Decode_ /mips_tb/U_0/ID/INTR
 add wave -noupdate -group Decode_ /mips_tb/U_0/ID/INTA
 add wave -noupdate -group Decode_ -radix hexadecimal /mips_tb/U_0/ID/PC
-add wave -noupdate -group Decode_ -radix hexadecimal -childformat {{/mips_tb/U_0/ID/register_array(0) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(1) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(2) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(3) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(4) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(5) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(6) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(7) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(8) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(9) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(10) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(11) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(12) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(13) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(14) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(15) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(16) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(17) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(18) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(19) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(20) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(21) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(22) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(23) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(24) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(25) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(26) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(27) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(28) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(29) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(30) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(31) -radix hexadecimal}} -expand -subitemconfig {/mips_tb/U_0/ID/register_array(0) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(1) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(2) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(3) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(4) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(5) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(6) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(7) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(8) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(9) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(10) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(11) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(12) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(13) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(14) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(15) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(16) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(17) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(18) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(19) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(20) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(21) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(22) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(23) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(24) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(25) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(26) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(27) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(28) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(29) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(30) {-radix hexadecimal} /mips_tb/U_0/ID/register_array(31) {-radix hexadecimal}} /mips_tb/U_0/ID/register_array
+add wave -noupdate -group Decode_ -radix hexadecimal -childformat {{/mips_tb/U_0/ID/register_array(0) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(1) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(2) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(3) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(4) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(5) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(6) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(7) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(8) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(9) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(10) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(11) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(12) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(13) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(14) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(15) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(16) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(17) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(18) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(19) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(20) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(21) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(22) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(23) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(24) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(25) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(26) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(27) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(28) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(29) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(30) -radix hexadecimal} {/mips_tb/U_0/ID/register_array(31) -radix hexadecimal}} -expand -subitemconfig {/mips_tb/U_0/ID/register_array(0) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(1) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(2) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(3) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(4) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(5) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(6) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(7) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(8) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(9) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(10) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(11) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(12) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(13) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(14) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(15) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(16) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(17) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(18) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(19) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(20) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(21) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(22) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(23) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(24) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(25) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(26) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(27) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(28) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(29) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(30) {-height 15 -radix hexadecimal} /mips_tb/U_0/ID/register_array(31) {-height 15 -radix hexadecimal}} /mips_tb/U_0/ID/register_array
 add wave -noupdate -group Decode_ -radix hexadecimal /mips_tb/U_0/ID/write_register_address
 add wave -noupdate -group Decode_ -radix hexadecimal /mips_tb/U_0/ID/write_data
 add wave -noupdate -group Decode_ -radix hexadecimal /mips_tb/U_0/ID/read_register_1_address
@@ -126,26 +126,50 @@ add wave -noupdate -group GPIO /mips_tb/U_0/IO/BTIFG
 add wave -noupdate -group GPIO /mips_tb/U_0/IO/TODO_not_connected_yet
 add wave -noupdate -group GPIO /mips_tb/U_0/IO/ifg_write
 add wave -noupdate -group GPIO /mips_tb/U_0/IO/ifg_read
-add wave -noupdate -group Interrupt /mips_tb/U_0/IO/INTRPT/clock
-add wave -noupdate -group Interrupt /mips_tb/U_0/IO/INTRPT/irq0
-add wave -noupdate -group Interrupt /mips_tb/U_0/IO/INTRPT/irq1
-add wave -noupdate -group Interrupt /mips_tb/U_0/IO/INTRPT/irq2
-add wave -noupdate -group Interrupt /mips_tb/U_0/IO/INTRPT/irq3
-add wave -noupdate -group Interrupt /mips_tb/U_0/IO/INTRPT/INTA
-add wave -noupdate -group Interrupt /mips_tb/U_0/IO/INTRPT/GIE_enable
-add wave -noupdate -group Interrupt /mips_tb/U_0/IO/INTRPT/reset
-add wave -noupdate -group Interrupt -radix hexadecimal /mips_tb/U_0/IO/INTRPT/data
-add wave -noupdate -group Interrupt /mips_tb/U_0/IO/INTRPT/GIE_ctl
-add wave -noupdate -group Interrupt /mips_tb/U_0/IO/INTRPT/IFG_store_ctl
-add wave -noupdate -group Interrupt /mips_tb/U_0/IO/INTRPT/IFG_load_ctl
-add wave -noupdate -group Interrupt /mips_tb/U_0/IO/INTRPT/IE_ctl
-add wave -noupdate -group Interrupt /mips_tb/U_0/IO/INTRPT/INTR
-add wave -noupdate -group Interrupt -radix hexadecimal /mips_tb/U_0/IO/INTRPT/TYPEx
-add wave -noupdate -group Interrupt /mips_tb/U_0/IO/INTRPT/out_IFG
-add wave -noupdate -group Interrupt /mips_tb/U_0/IO/INTRPT/GIE
-add wave -noupdate -group Interrupt -radix hexadecimal /mips_tb/U_0/IO/INTRPT/IE
-add wave -noupdate -group Interrupt -radix hexadecimal /mips_tb/U_0/IO/INTRPT/IFG
-add wave -noupdate -group Interrupt -radix hexadecimal /mips_tb/U_0/IO/INTRPT/IFG2
+add wave -noupdate -expand -group Interrupt_ /mips_tb/U_0/IO/INTRPT/clock
+add wave -noupdate -expand -group Interrupt_ /mips_tb/U_0/IO/INTRPT/INTA
+add wave -noupdate -expand -group Interrupt_ /mips_tb/U_0/IO/INTRPT/INTR
+add wave -noupdate -expand -group Interrupt_ /mips_tb/U_0/IO/INTRPT/INTA_STATE
+add wave -noupdate -expand -group Interrupt_ /mips_tb/U_0/IO/INTRPT/irq0
+add wave -noupdate -expand -group Interrupt_ /mips_tb/U_0/IO/INTRPT/irq1
+add wave -noupdate -expand -group Interrupt_ /mips_tb/U_0/IO/INTRPT/irq2
+add wave -noupdate -expand -group Interrupt_ /mips_tb/U_0/IO/INTRPT/irq3
+add wave -noupdate -expand -group Interrupt_ /mips_tb/U_0/IO/INTRPT/irq4
+add wave -noupdate -expand -group Interrupt_ /mips_tb/U_0/IO/INTRPT/irq5
+add wave -noupdate -expand -group Interrupt_ /mips_tb/U_0/IO/INTRPT/GIE_enable
+add wave -noupdate -expand -group Interrupt_ /mips_tb/U_0/IO/INTRPT/reset
+add wave -noupdate -expand -group Interrupt_ -radix hexadecimal /mips_tb/U_0/IO/INTRPT/data
+add wave -noupdate -expand -group Interrupt_ /mips_tb/U_0/IO/INTRPT/GIE_ctl
+add wave -noupdate -expand -group Interrupt_ /mips_tb/U_0/IO/INTRPT/IFG_store_ctl
+add wave -noupdate -expand -group Interrupt_ /mips_tb/U_0/IO/INTRPT/IFG_load_ctl
+add wave -noupdate -expand -group Interrupt_ /mips_tb/U_0/IO/INTRPT/IE_ctl
+add wave -noupdate -expand -group Interrupt_ -radix hexadecimal /mips_tb/U_0/IO/INTRPT/TYPEx
+add wave -noupdate -expand -group Interrupt_ -radix hexadecimal /mips_tb/U_0/IO/INTRPT/out_IFG
+add wave -noupdate -expand -group Interrupt_ /mips_tb/U_0/IO/INTRPT/GIE
+add wave -noupdate -expand -group Interrupt_ -radix hexadecimal /mips_tb/U_0/IO/INTRPT/IE
+add wave -noupdate -expand -group Interrupt_ -radix hexadecimal /mips_tb/U_0/IO/INTRPT/IFG
+add wave -noupdate -expand -group Interrupt_ -radix hexadecimal /mips_tb/U_0/IO/INTRPT/IFG2
+add wave -noupdate -expand -group Interrupt_ /mips_tb/U_0/IO/INTRPT/SERVICED
+add wave -noupdate -group BasicTimer_ /mips_tb/U_0/IO/BT/clock
+add wave -noupdate -group BasicTimer_ /mips_tb/U_0/IO/BT/reset
+add wave -noupdate -group BasicTimer_ /mips_tb/U_0/IO/BT/data
+add wave -noupdate -group BasicTimer_ /mips_tb/U_0/IO/BT/BTCTL_ctl
+add wave -noupdate -group BasicTimer_ /mips_tb/U_0/IO/BT/BTCNT_ctl
+add wave -noupdate -group BasicTimer_ /mips_tb/U_0/IO/BT/BTIFG_OUT
+add wave -noupdate -group BasicTimer_ /mips_tb/U_0/IO/BT/counter
+add wave -noupdate -group BasicTimer_ /mips_tb/U_0/IO/BT/counterPlus
+add wave -noupdate -group BasicTimer_ /mips_tb/U_0/IO/BT/counterInput
+add wave -noupdate -group BasicTimer_ /mips_tb/U_0/IO/BT/BTIPX
+add wave -noupdate -group BasicTimer_ /mips_tb/U_0/IO/BT/BTSSEL
+add wave -noupdate -group BasicTimer_ /mips_tb/U_0/IO/BT/BTHOLD
+add wave -noupdate -group BasicTimer_ /mips_tb/U_0/IO/BT/BTCTL_reg
+add wave -noupdate -group BasicTimer_ /mips_tb/U_0/IO/BT/BTSSEL_mux
+add wave -noupdate -group BasicTimer_ /mips_tb/U_0/IO/BT/MCLK2
+add wave -noupdate -group BasicTimer_ /mips_tb/U_0/IO/BT/MCLK4
+add wave -noupdate -group BasicTimer_ /mips_tb/U_0/IO/BT/MCLK8
+add wave -noupdate -group BasicTimer_ /mips_tb/U_0/IO/BT/inCounter
+add wave -noupdate -group BasicTimer_ /mips_tb/U_0/IO/BT/BTIFG
+add wave -noupdate -group BasicTimer_ /mips_tb/U_0/IO/BT/BTIFG_REG
 add wave -noupdate -divider {Control Signals}
 add wave -noupdate -group Control /mips_tb/U_0/CTL/Opcode
 add wave -noupdate -group Control /mips_tb/U_0/CTL/RegDst
@@ -176,7 +200,7 @@ add wave -noupdate -group Control /mips_tb/U_0/CTL/Jal
 add wave -noupdate -group Control /mips_tb/U_0/CTL/Lui
 add wave -noupdate -group Control /mips_tb/U_0/CTL/RegWriteSig
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {2250314 ps} 0}
+WaveRestoreCursors {{Cursor 1} {15057792 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 305
 configure wave -valuecolwidth 40
@@ -192,4 +216,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {2096256 ps} {2711852 ps}
+WaveRestoreZoom {0 ps} {5675112 ps}

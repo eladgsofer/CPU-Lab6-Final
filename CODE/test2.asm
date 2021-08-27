@@ -36,19 +36,20 @@
 UartRX_ISR:
 UartTX_ISR:
 main:	addi $sp,$zero,0x800 # $sp=0x800
-	addi $t0,$zero,0x3F  # 0011 1111
-	#sw   $t0,0x824       # BTIP=7, BTSSEL=3, BTHOLD=1
-	#sw   $0,0x828        # BTCNT=0
+	addi $t0,$zero,0x22  # 0011 1111
+	# 	00100001
+	sw   $t0,0x824       # BTIP=7, BTSSEL=3, BTHOLD=1
+	sw   $0,0x828        # BTCNT=0
 	sw   $0,0x82C        # IE=0 for all
 	sw   $0,0x82D        # IFG=0 
-	# addi $t0,$zero,0x1F  # 0001 1111 - Verify configuration 
-	# sw   $t0,0x824       # BTIP=7, BTSSEL=3, BTHOLD=0
-	addi $t0,$zero,0x38  # FF CHANGED FROM 3C
+	addi $t0,$zero,0x02  # 0001 1111 - Verify configuration 
+	sw   $t0,0x824       # BTIP=7, BTSSEL=3, BTHOLD=0
+	addi $t0,$zero,0x3C  # FF CHANGED FROM 3C
 	sw   $t0,0x82C       # IE=0x38 all keys are up!
 	ori  $k0,$k0,0x01    # EINT, $k0[0]=1 uses as GIE
-	
-	addi $t2,$zero,0x4	
-	sw   $t2,0x800 # write to PORT_LEDG[7-0] LED SHOULD BE 4
+# Sanity check	
+#	addi $t2,$zero,0x4	
+#	sw   $t2,0x800 # write to PORT_LEDG[7-0] LED SHOULD BE 4
 		
 L:	j    L		    # infinite loop
 	
