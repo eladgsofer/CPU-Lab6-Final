@@ -12,8 +12,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity UART_RX is
     Generic (
-        CLK_DIV_VAL : integer := 16;
-        PARITY_BIT  : string  := "none" -- type of parity: "none", "even", "odd", "mark", "space"
+        CLK_DIV_VAL : integer := 16
     );
     Port (
         CLK          : in  std_logic; -- system clock
@@ -115,8 +114,7 @@ begin
 
         uart_rx_parity_gen_i: entity work.UART_PARITY
         generic map (
-            DATA_WIDTH  => 8,
-            PARITY_TYPE => PARITY_BIT
+            DATA_WIDTH  => 8
         )
         port map (
             DATA_IN     => rx_data,
@@ -209,7 +207,7 @@ begin
                 fsm_idle     <= '0';
 
                 if ((rx_clk_en = '1') AND (rx_bit_count = "111")) then
-                    if (PARITY_MODE = "000" OR PARITY_MODE = "001" OR PARITY_MODE = "010" OR PARITY_MODE = "011") then
+                    if (PARITY_MODE = "100") then
                         fsm_nstate <= stopbit;
                     else
                         fsm_nstate <= paritybit;

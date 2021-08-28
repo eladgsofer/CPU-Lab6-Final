@@ -12,8 +12,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity UART_PARITY is
     Generic (
-        DATA_WIDTH  : integer := 8;
-        PARITY_TYPE : string  := "none" -- legal values: "none", "even", "odd", "mark", "space"
+        DATA_WIDTH  : integer := 8
     );
     Port (
         DATA_IN     : in  std_logic_vector(DATA_WIDTH-1 downto 0);
