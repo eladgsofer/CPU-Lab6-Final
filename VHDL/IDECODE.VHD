@@ -18,7 +18,8 @@ ENTITY Idecode IS
         Sign_extend : OUT   STD_LOGIC_VECTOR( 31 DOWNTO 0 );
         clock,reset : IN    STD_LOGIC;
         INTR,INTA   : IN    STD_LOGIC;
-        PC          : IN    STD_LOGIC_VECTOR(9 DOWNTO 0)
+        PC          : IN    STD_LOGIC_VECTOR(9 DOWNTO 0);
+        Is_k1       : OUT   STD_LOGIC
     );
 END Idecode;
 
@@ -54,6 +55,7 @@ BEGIN
                     -- Mux to bypass data memory for Rformat instructions
     -- write_data <= ALU_result( 31 DOWNTO 0 ) WHEN ( MemtoReg = '0' ) ELSE 
                   -- read_data;
+    Is_k1 <= '1' WHEN read_register_1_address = "11011" ELSE '0';
     
     write_data <= read_data                    WHEN MemtoReg = "01" ELSE 
                   X"00000" & B"00" & PC_plus_4 WHEN MemtoReg = "10" ELSE
@@ -80,7 +82,7 @@ PROCESS
         END IF;
         
 		IF INTR = '1' and INTA = '0' THEN
-            register_array(27) <= (X"000000" & PC(9 downto 2));
+            register_array(27) <= (X"00000"& "00" & PC(9 downto 0));
 		END IF;
     END PROCESS;
 END behavior;

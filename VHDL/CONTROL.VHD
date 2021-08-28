@@ -23,8 +23,8 @@ ENTITY control IS
     INTR        : IN    STD_LOGIC;
     INTA        : OUT   STD_LOGIC;
     RT		    : IN 	STD_LOGIC_VECTOR( 4 DOWNTO 0 );
-    GIE_ctl		: OUT   STD_LOGIC
-
+    GIE_ctl		: OUT   STD_LOGIC;
+    is_k1       : IN    STD_LOGIC
     );
 
 END control;
@@ -32,7 +32,7 @@ END control;
 ARCHITECTURE behavior OF control IS
 
     SIGNAL  R_format, OpcodeZero, I_format, Lw, Sw, Beq, Mul,Jal,Lui,RegWriteSig    : STD_LOGIC;
-
+    SIGNAL  INTA_REG : STD_LOGIC;
 BEGIN           
                 -- Code to generate control signals using opcode bits
     R_format    <=  '1'  WHEN  Opcode = "000000" ELSE '0';
@@ -53,10 +53,10 @@ BEGIN
                     "10" WHEN Jal = '1' ELSE -- jump and link writes to reg 31 from pc+4
                     "11" WHEN Lui = '1' ELSE -- Load upper immediate writes to regs from (immediate << 16)
                     "00";                    -- all others write to regs from alu result
-    RegWriteSig    <=  '1' WHEN (INTR = '0') AND (((R_format AND NOT Jr) OR Lw OR I_format OR Mul OR Jal) = '1') ELSE '0';
+    RegWriteSig    <=  '1' WHEN (INTR = '0' OR INTA_REG = '1') AND (((R_format AND NOT Jr) OR Lw OR I_format OR Mul OR Jal) = '1') ELSE '0';
     RegWrite       <=RegWriteSig;
     MemRead     <=  Lw;
-    MemWrite    <=  '1' WHEN (INTR = '0') AND (Sw = '1') ELSE '0'; 
+    MemWrite    <=  '1' WHEN (INTR = '0' OR INTA_REG = '1') AND (Sw = '1') ELSE '0';
     Branch      <=  Beq;
     --ALUOp( 1 )    <=  R_format;
     --ALUOp( 0 )    <=  Beq; 
@@ -76,19 +76,19 @@ BEGIN
 -- 011 : or   - ORI 
 -- 100 : and  - ANDI
 -- 101 : mul  - MUL    
-
+    INTA <= INTA_REG;
     -- Interrupts
     --GIE_ctl	<=  '1'  WHEN (RegWrite AND (RT = "11010")) ELSE '0' ;
     GIE_ctl	<=  '1'  WHEN ((RegWriteSig = '1') AND (RT = "11010")) ELSE '0' ;
     PROCESS (clock,reset)
 		BEGIN
-			IF(reset='0') THEN
-				INTA <= '0'; 				
+			IF(reset='1') THEN
+				INTA_REG <= '0'; 				
 			ELSIF(clock'EVENT AND clock='1') THEN
 				IF INTR = '1' THEN 	-- one clock after INTR we raise INTA
-					INTA <= '1';
-				ElSIF (R_format='1' and Jr = '1' and (RT = "11010")) THEN -- we reset INTA when it is a jr command and the register is $k1
-					INTA <= '0'; 
+					INTA_REG <= '1';
+				ElSIF (R_format='1' and Jr = '1' and Is_k1 = '1') THEN -- we reset INTA when it is a jr command and the register is $k1
+					INTA_REG <= '0'; 
 				END IF;
 			END IF;
 	END PROCESS;
