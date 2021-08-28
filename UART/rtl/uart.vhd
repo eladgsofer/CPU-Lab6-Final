@@ -19,13 +19,14 @@ use IEEE.MATH_REAL.ALL;
 entity UART is
     Generic (
         CLK_FREQ      : integer := 50e6;   -- system clock frequency in Hz
-        BAUD_RATE     : integer := 115200; -- baud rate value
+        --BAUD_RATE     : integer := 115200; -- baud rate value
         USE_DEBOUNCER : boolean := True    -- enable/disable debouncer
     );
     Port (
         -- CLOCK AND RESET
         CLK          : in  std_logic; -- system clock
         RST          : in  std_logic; -- high active synchronous reset
+		  BAUD_RATE    : in std_logic_vector(16 downto 0);
 		  
 		  -- Parity Mode: "Even" - 000, "Odd" - 001, "Mark" - 010, "space" - 011 None - 100
         PARITY_MODE: in std_logic_vector(2 downto 0);
@@ -45,9 +46,11 @@ entity UART is
 end entity;
 
 architecture RTL of UART is
-
-    constant OS_CLK_DIV_VAL   : integer := integer(real(CLK_FREQ)/real(16*BAUD_RATE));
-    constant UART_CLK_DIV_VAL : integer := integer(real(CLK_FREQ)/real(OS_CLK_DIV_VAL*BAUD_RATE));
+		
+    --constant OS_CLK_DIV_VAL   : integer := integer(real(CLK_FREQ)/real(16*BAUD_RATE));
+	 constant OS_CLK_DIV_VAL   : integer := integer(real(CLK_FREQ)/real(16*(to_integer(unsigned(BAUD_RATE)))));
+	 --constant UART_CLK_DIV_VAL : integer := integer(real(CLK_FREQ)/real(OS_CLK_DIV_VAL*BAUD_RATE));
+    constant UART_CLK_DIV_VAL : integer := integer(real(CLK_FREQ)/real(OS_CLK_DIV_VAL*(to_integer(unsigned(BAUD_RATE)))));
 
     signal os_clk_en            : std_logic;
     signal uart_rxd_meta_n      : std_logic;
@@ -118,6 +121,8 @@ begin
     port map (
         CLK          => CLK,
         RST          => RST,
+		  	-- Parity Mode: "Even" - 000, "Odd" - 001, "Mark" - 010, "space" - 011 None - 100
+
 		  PARITY_MODE => PARITY_MODE,
         -- UART INTERFACE
         UART_CLK_EN  => os_clk_en,

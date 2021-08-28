@@ -18,7 +18,7 @@ use IEEE.NUMERIC_STD.ALL;
 entity UART_LOOPBACK_CYC1000 is
     Generic (
         CLK_FREQ      : integer := 12e6;   -- set system clock frequency in Hz
-        BAUD_RATE     : integer := 115200; -- baud rate value
+        --BAUD_RATE     : integer := 115200; -- baud rate value
         USE_DEBOUNCER : boolean := True    -- enable/disable debouncer
     );
     Port (
@@ -36,6 +36,7 @@ architecture RTL of UART_LOOPBACK_CYC1000 is
     signal reset   : std_logic;
     signal data    : std_logic_vector(7 downto 0);
     signal valid   : std_logic;
+	 signal BAUD_RATE : std_logic_vector(16 downto 0);
  signal CLK_12M : std_logic := '0';
 begin
 
@@ -47,6 +48,8 @@ begin
 	END PROCESS;
     
     rst_btn <= not RST_BTN_N;
+	 -- baud is 11520
+	 BAUD_RATE <= std_logic_vector(to_unsigned(115200, BAUD_RATE'length));
 
     rst_sync_i : entity work.RST_SYNC
     port map (
@@ -58,7 +61,6 @@ begin
 	uart_i: entity work.UART
     generic map (
         CLK_FREQ      => CLK_FREQ,
-        BAUD_RATE     => BAUD_RATE,
         USE_DEBOUNCER => USE_DEBOUNCER
     )
     port map (
@@ -67,6 +69,7 @@ begin
 		  -- Parity Mode: "Even" - 000, "Odd" - 001, "Mark" - 010, "space" - 011 None - 100
 		  PARITY_MODE => "000",
         -- UART INTERFACE
+		  BAUD_RATE => BAUD_RATE,
         UART_TXD     => UART_TXD,
         UART_RXD     => UART_RXD,
         -- USER DATA INPUT INTERFACE
