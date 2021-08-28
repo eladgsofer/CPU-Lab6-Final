@@ -111,7 +111,9 @@ begin
         )
         port map (
             DATA_IN     => rx_data,
+				PARITY_MODE => "000",
             PARITY_OUT  => rx_parity_bit
+				
         );
 
         uart_rx_parity_check_reg_p : process (CLK)

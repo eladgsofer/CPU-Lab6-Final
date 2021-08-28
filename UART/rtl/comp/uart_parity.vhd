@@ -17,19 +17,32 @@ entity UART_PARITY is
     );
     Port (
         DATA_IN     : in  std_logic_vector(DATA_WIDTH-1 downto 0);
+        PARITY_MODE : in  std_logic_vector(2 downto 0);
+
         PARITY_OUT  : out std_logic
     );
 end entity;
 
 architecture RTL of UART_PARITY is
 
+SIGNAL PARITY_EVEN_OUT: std_logic;
+SIGNAL PARITY_ODD_OUT: std_logic;
+SIGNAL PARITY_MARK_OUT: std_logic;
+SIGNAL PARITY_SPACE_OUT: std_logic;
+
 begin
 
     -- -------------------------------------------------------------------------
     -- PARITY BIT GENERATOR
     -- -------------------------------------------------------------------------
+    -- Parity Mode: "Even" - 000, "Odd" - 001, "Mark" - 010, "space" - 011 None - 100
+    PARITY_OUT <= PARITY_EVEN_OUT  when  (PARITY_MODE = "000") else
+                  PARITY_ODD_OUT  when   (PARITY_MODE = "001")  else
+                  PARITY_MARK_OUT  when  (PARITY_MODE = "010") else
+                  PARITY_SPACE_OUT;
+						
 
-    even_parity_g : if (PARITY_TYPE = "even") generate
+    even_parity_g : 
         process (DATA_IN)
         	variable parity_temp : std_logic;
         begin
@@ -37,11 +50,10 @@ begin
             for i in DATA_IN'range loop
                 parity_temp := parity_temp XOR DATA_IN(i);
             end loop;
-            PARITY_OUT <= parity_temp;
+            PARITY_EVEN_OUT <= parity_temp;
         end process;
-    end generate;
 
-    odd_parity_g : if (PARITY_TYPE = "odd") generate
+    odd_parity_g : 
         process (DATA_IN)
         	variable parity_temp : std_logic;
         begin
@@ -49,16 +61,11 @@ begin
             for i in DATA_IN'range loop
                 parity_temp := parity_temp XOR DATA_IN(i);
             end loop;
-            PARITY_OUT <= parity_temp;
+            PARITY_ODD_OUT <= parity_temp;
         end process;
-    end generate;
 
-    mark_parity_g : if (PARITY_TYPE = "mark") generate
-        PARITY_OUT <= '1';
-    end generate;
+    mark_parity_g : PARITY_MARK_OUT <= '1';
 
-    space_parity_g : if (PARITY_TYPE = "space") generate
-        PARITY_OUT <= '0';
-    end generate;
+    space_parity_g : PARITY_SPACE_OUT <= '0';
 
 end architecture;

@@ -27,6 +27,9 @@ entity UART is
         -- CLOCK AND RESET
         CLK          : in  std_logic; -- system clock
         RST          : in  std_logic; -- high active synchronous reset
+		  
+		  -- Parity Mode: "Even" - 000, "Odd" - 001, "Mark" - 010, "space" - 011 None - 100
+        PARITY_MODE: in std_logic_vector(2 downto 0);
         -- UART INTERFACE
         UART_TXD     : out std_logic; -- serial transmit data
         UART_RXD     : in  std_logic; -- serial receive data
@@ -54,7 +57,6 @@ architecture RTL of UART is
     signal uart_rxd_debounced   : std_logic;
 
 begin
-
     -- -------------------------------------------------------------------------
     --  UART OVERSAMPLING (~16X) CLOCK DIVIDER AND CLOCK ENABLE FLAG
     -- -------------------------------------------------------------------------
@@ -141,6 +143,7 @@ begin
         CLK         => CLK,
         RST         => RST,
         -- UART INTERFACE
+		  PARITY_MODE => PARITY_MODE,
         UART_CLK_EN => os_clk_en,
         UART_TXD    => UART_TXD,
         -- USER DATA INPUT INTERFACE

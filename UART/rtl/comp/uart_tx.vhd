@@ -18,6 +18,8 @@ entity UART_TX is
     Port (
         CLK         : in  std_logic; -- system clock
         RST         : in  std_logic; -- high active synchronous reset
+		  -- Parity Mode: "Even" - 000, "Odd" - 001, "Mark" - 010, "space" - 011 None - 100
+        PARITY_MODE: in std_logic_vector(2 downto 0);
         -- UART INTERFACE
         UART_CLK_EN : in  std_logic; -- oversampling (16x) UART clock enable
         UART_TXD    : out std_logic; -- serial transmit data
@@ -42,10 +44,16 @@ architecture RTL of UART_TX is
     type state is (idle, txsync, startbit, databits, paritybit, stopbit);
     signal tx_pstate : state;
     signal tx_nstate : state;
+	 
+	 SIGNAL TX_PARITY_BIT_NOT_NONE: std_logic;
+    SIGNAL TX_PARITY_BIT_IS_NONE: std_logic;
 
 begin
 
     DIN_RDY <= tx_ready;
+	 
+	 tx_parity_bit <= TX_PARITY_BIT_NOT_NONE  when  (PARITY_MODE = "000" OR PARITY_MODE = "001" OR PARITY_MODE = "010" OR PARITY_MODE = "011")  else
+                     TX_PARITY_BIT_IS_NONE;
 
     -- -------------------------------------------------------------------------
     -- UART TRANSMITTER CLOCK DIVIDER AND CLOCK ENABLE FLAG
@@ -100,7 +108,7 @@ begin
     -- UART TRANSMITTER PARITY GENERATOR
     -- -------------------------------------------------------------------------
 
-    uart_tx_parity_g : if (PARITY_BIT /= "none") generate
+
         uart_tx_parity_gen_i: entity work.UART_PARITY
         generic map (
             DATA_WIDTH  => 8,
@@ -108,13 +116,15 @@ begin
         )
         port map (
             DATA_IN     => tx_data,
-            PARITY_OUT  => tx_parity_bit
+				PARITY_MODE => PARITY_MODE,
+            PARITY_OUT  => TX_PARITY_BIT_NOT_NONE
+				
         );
-    end generate;
 
-    uart_tx_noparity_g : if (PARITY_BIT = "none") generate
-        tx_parity_bit <= '0';
-    end generate;
+
+    uart_tx_noparity_g : 
+        TX_PARITY_BIT_IS_NONE <= '0';
+
 
     -- -------------------------------------------------------------------------
     -- UART TRANSMITTER OUTPUT DATA REGISTER
@@ -157,7 +167,7 @@ begin
     end process;
 
     -- NEXT STATE AND OUTPUTS LOGIC
-    process (tx_pstate, DIN_VLD, tx_clk_en, tx_bit_count)
+    process (tx_pstate, DIN_VLD, tx_clk_en, tx_bit_count, PARITY_MODE)
     begin
 
         case tx_pstate is
@@ -205,7 +215,7 @@ begin
                 tx_clk_div_clr <= '0';
 
                 if ((tx_clk_en = '1') AND (tx_bit_count = "111")) then
-                    if (PARITY_BIT = "none") then
+                    if (PARITY_MODE = "100") then
                         tx_nstate <= stopbit;
                     else
                         tx_nstate <= paritybit;
