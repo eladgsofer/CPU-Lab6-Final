@@ -120,6 +120,7 @@ begin
     port map (
         CLK          => CLK,
         RST          => RST,
+        PARITY_MODE => PARITY_MODE,
         -- UART INTERFACE
         UART_CLK_EN  => os_clk_en,
         UART_RXD     => uart_rxd_debounced,
@@ -143,7 +144,7 @@ begin
         CLK         => CLK,
         RST         => RST,
         -- UART INTERFACE
-		  PARITY_MODE => PARITY_MODE,
+		PARITY_MODE => PARITY_MODE,
         UART_CLK_EN => os_clk_en,
         UART_TXD    => UART_TXD,
         -- USER DATA INPUT INTERFACE
