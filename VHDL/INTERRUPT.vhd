@@ -9,6 +9,8 @@ ENTITY Interrupt IS
     clock,irq0,irq1,irq2,irq3,irq4,irq5, INTA,GIE_enable,reset  : IN    STD_LOGIC;
     data                            : IN    STD_LOGIC_VECTOR( 31 DOWNTO 0 );
     GIE_ctl,IFG_store_ctl,IFG_load_ctl,IE_ctl           : IN    STD_LOGIC;
+    Rx_read                         : IN STD_LOGIC;
+    Tx_Write                        : IN STD_LOGIC;
     INTR                            : OUT   STD_LOGIC;
     TYPEx                           : OUT   STD_LOGIC_VECTOR( 31 DOWNTO 0 );
     out_IFG                         : OUT   STD_LOGIC_VECTOR( 31 DOWNTO 0 )
@@ -96,22 +98,30 @@ BEGIN
                 IFG <= "000000";
             ELSIF(clock'EVENT AND clock='0') THEN -- 0 or 1?    
             
-       
-                IF (IFG_store_ctl ='1') THEN  -- store to
+                -- Read or Write to IFG
+                IF (IFG_store_ctl ='1') THEN  
                     IFG <= data(5 DOWNTO 0);        
-                ELSIF (IFG_load_ctl='1') THEN  -- load from
+                ELSIF (IFG_load_ctl='1') THEN 
                     out_IFG <= X"000000" & "00" &IFG(5 downto 0);
-                -- Automatically turn off the IFG when an interrupt finished it's ISR    
+
+                -- Automatically turn off the IFG when an interrupt finished it's ISR
                 ELSIF (Inta_state = CleanIFG) THEN
                     CLEARED <= '1';
                     IF (SERVICED(0)='1') THEN 
-                        IFG(0) <= '0';
+                        IFG(0) <= '0'; --RX
                     ELSIF (SERVICED(1)='1') THEN 
-                        IFG(1) <= '0';                    
+                        IFG(1) <= '0'; --TX               
                     ELSE 
-                        IFG(2) <= '0';
+                        IFG(2) <= '0'; --BT
                     END IF;
+
+                -- Automatically Clean the uart ifg when the buffer is read/written
+                ELSIF (Rx_read = '1') THEN
+                    IFG(0) <= '0';
+                ELSIF (Tx_Write = '1') THEN
+                    IFG(1) <= '0';
                 
+                -- Defualt Value is IFG2
                 ELSE 
                     CLEARED<='0';
                     IFG <= IFG2;
@@ -122,17 +132,16 @@ BEGIN
     
         
         
-    
-    PROCESS ( GIE, irq0, irq1, irq2, irq3, irq4, irq5, reset, IFG_store_ctl, INTA, IE, clock )
+    -- IFG2
+    PROCESS ( GIE, irq0, irq1, irq2, irq3, irq4, irq5, reset, IFG_store_ctl, INTA, IE, Rx_read, Tx_Write, clock )
         BEGIN
             IF(reset='1') THEN
                     IFG2 <= "000000";
-            --ELSIF (IFG_store_ctl ='1') THEN  -- store to
-            --      IFG2 <= data(3 DOWNTO 0);
             ELSIF (clock'EVENT AND clock='0') THEN
                 
                 IF (IFG_store_ctl ='1') THEN  -- store to
                     IFG2 <= data(5 DOWNTO 0);
+                
                 -- Automatically turn off the IFG when an interrupt finished it's ISR    
                 ELSIF (Inta_state = CleanIFG) THEN
                     CLEARED2 <= '1';
@@ -143,6 +152,14 @@ BEGIN
                     ELSE 
                         IFG2(2) <= '0';
                     END IF;
+                
+                -- Automatically Clean the uart ifg when the buffer is read/written
+                ELSIF (Rx_read = '1') THEN
+                    IFG2(0) <= '0';
+                ELSIF (Tx_Write = '1') THEN
+                    IFG2(1) <= '0';
+                
+                -- The Value of ifg2 is by defualt changed when one of the interrupts is on and enabled
                 ELSIF (GIE = '1' AND INTA ='0') THEN
                     CLEARED2 <= '0';
                     IF (irq0='1' AND IE(0) = '1')  THEN --Uart Rx
@@ -171,8 +188,9 @@ BEGIN
         END PROCESS;
         
         
-    INTR <= INTR_REG;
-    -- this is where the work happens. 
+    
+    
+    -- Set The Intr and the Typex
     PROCESS(clock, IE, IFG, GIE, INTA)
         BEGIN
             IF(clock'EVENT AND clock='1') THEN
@@ -203,7 +221,7 @@ BEGIN
                 END IF;
             END IF;
     END PROCESS;
-    
+    INTR <= INTR_REG;
     
     
     
