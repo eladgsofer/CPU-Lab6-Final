@@ -18,7 +18,7 @@ use IEEE.NUMERIC_STD.ALL;
 entity UART_LOOPBACK_CYC1000 is
     Generic (
         CLK_FREQ      : integer := 24e6;   -- set system clock frequency in Hz
-        BAUD_RATE     : integer := 115200; -- baud rate value
+        
         USE_DEBOUNCER : boolean := True    -- enable/disable debouncer
     );
     Port (
@@ -51,13 +51,13 @@ begin
 	uart_i: entity work.UART
     generic map (
         CLK_FREQ      => CLK_FREQ,
-        BAUD_RATE     => BAUD_RATE,
         USE_DEBOUNCER => USE_DEBOUNCER
     )
     port map (
         CLK          => CLK_24M,
         RST          => reset,
-		PARITY_MODE => "100",
+		  PARITY_MODE => "100",
+		  BAUD_RATE     => '0', -- 1 FOR 115200
         -- UART INTERFACE
         UART_TXD     => UART_TXD,
         UART_RXD     => UART_RXD,

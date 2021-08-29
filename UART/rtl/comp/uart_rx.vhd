@@ -11,13 +11,11 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 entity UART_RX is
-    Generic (
-        CLK_DIV_VAL : integer := 16
-    );
     Port (
         CLK          : in  std_logic; -- system clock
         RST          : in  std_logic; -- high active synchronous reset
         PARITY_MODE  : in  std_logic_vector(2 DOWNTO 0);
+        CLK_DIV_VAL :  in integer := 16;
         -- UART INTERFACE
         UART_CLK_EN  : in  std_logic; -- oversampling (16x) UART clock enable
         UART_RXD     : in  std_logic; -- serial receive data
@@ -57,13 +55,11 @@ begin
     -- -------------------------------------------------------------------------
 
     rx_clk_divider_i : entity work.UART_CLK_DIV
-    generic map(
-        DIV_MAX_VAL  => CLK_DIV_VAL,
-        DIV_MARK_POS => 3
-    )
     port map (
         CLK      => CLK,
         RST      => RST,
+        DIV_MAX_VAL  => CLK_DIV_VAL,
+		  DIV_MARK_POS => 3,
         CLEAR    => fsm_idle,
         ENABLE   => UART_CLK_EN,
         DIV_MARK => rx_clk_en
@@ -116,7 +112,7 @@ begin
         )
         port map (
             DATA_IN     => rx_data,
-				PARITY_MODE => PARITY_MODE,
+			PARITY_MODE => PARITY_MODE,
             PARITY_OUT  => rx_parity_bit
 				
         );
