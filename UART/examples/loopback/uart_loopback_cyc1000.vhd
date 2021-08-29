@@ -19,7 +19,6 @@ entity UART_LOOPBACK_CYC1000 is
     Generic (
         CLK_FREQ      : integer := 12e6;   -- set system clock frequency in Hz
         BAUD_RATE     : integer := 115200; -- baud rate value
-        PARITY_BIT    : string  := "odd"; -- legal values: "none", "even", "odd", "mark", "space"
         USE_DEBOUNCER : boolean := True    -- enable/disable debouncer
     );
     Port (
@@ -60,13 +59,12 @@ begin
     generic map (
         CLK_FREQ      => CLK_FREQ,
         BAUD_RATE     => BAUD_RATE,
-        USE_DEBOUNCER => USE_DEBOUNCER,
-        PARITY_BIT    => PARITY_BIT
+        USE_DEBOUNCER => USE_DEBOUNCER
     )
     port map (
         CLK          => CLK_12M,
         RST          => reset,
-		PARITY_MODE => "000",
+		PARITY_MODE => "001",
         -- UART INTERFACE
         UART_TXD     => UART_TXD,
         UART_RXD     => UART_RXD,

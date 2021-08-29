@@ -20,7 +20,6 @@ entity UART is
     Generic (
         CLK_FREQ      : integer := 50e6;   -- system clock frequency in Hz
         BAUD_RATE     : integer := 115200; -- baud rate value
-        PARITY_BIT    : string  := "none"; -- type of parity: "none", "even", "odd", "mark", "space"
         USE_DEBOUNCER : boolean := True    -- enable/disable debouncer
     );
     Port (
@@ -114,8 +113,7 @@ begin
 
     uart_rx_i: entity work.UART_RX
     generic map (
-        CLK_DIV_VAL => UART_CLK_DIV_VAL,
-        PARITY_BIT  => PARITY_BIT
+        CLK_DIV_VAL => UART_CLK_DIV_VAL
     )
     port map (
         CLK          => CLK,
@@ -137,8 +135,7 @@ begin
 
     uart_tx_i: entity work.UART_TX
     generic map (
-        CLK_DIV_VAL => UART_CLK_DIV_VAL,
-        PARITY_BIT  => PARITY_BIT
+        CLK_DIV_VAL => UART_CLK_DIV_VAL
     )
     port map (
         CLK         => CLK,
