@@ -45,7 +45,7 @@ inst_memory: altsyncram
     PORT MAP (
         clock0          => clock,
         address_a       => Mem_Addr, 
-        q_a                 => Instruction 
+        q_a             => Instruction 
     );
         
         -- Instructions always start on word address - not byte
