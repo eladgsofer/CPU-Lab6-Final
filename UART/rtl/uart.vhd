@@ -19,7 +19,6 @@ use IEEE.MATH_REAL.ALL;
 entity UART is
     Generic (
         CLK_FREQ      : integer := 50e6;   -- system clock frequency in Hz
-        BAUD_RATE     : integer := 115200; -- baud rate value
         USE_DEBOUNCER : boolean := True    -- enable/disable debouncer
     );
     Port (
@@ -29,6 +28,7 @@ entity UART is
 		  
 		  -- Parity Mode: "Even" - 000, "Odd" - 001, "Mark" - 010, "space" - 011 None - 100
         PARITY_MODE: in std_logic_vector(2 downto 0);
+		  BAUD_RATE  : in std_logic; -- 0 for 9600, and 1 for 115200
         -- UART INTERFACE
         UART_TXD     : out std_logic; -- serial transmit data
         UART_RXD     : in  std_logic; -- serial receive data
@@ -46,8 +46,15 @@ end entity;
 
 architecture RTL of UART is
 
-    constant OS_CLK_DIV_VAL   : integer := integer(real(CLK_FREQ)/real(16*BAUD_RATE));
-    constant UART_CLK_DIV_VAL : integer := integer(real(CLK_FREQ)/real(OS_CLK_DIV_VAL*BAUD_RATE));
+    signal OS_CLK_DIV_VAL   : integer;
+    signal UART_CLK_DIV_VAL : integer;
+
+    constant OS_CLK_DIV_VAL_115200   : integer := integer(real(CLK_FREQ)/real(16*115200));
+    constant UART_CLK_DIV_VAL_115200 : integer := integer(real(CLK_FREQ)/real(OS_CLK_DIV_VAL_115200*115200));
+    
+    constant OS_CLK_DIV_VAL_9600   : integer := integer(real(CLK_FREQ)/real(16*9600));
+    constant UART_CLK_DIV_VAL_9600 : integer := integer(real(CLK_FREQ)/real(OS_CLK_DIV_VAL_9600*9600));
+    
 
     signal os_clk_en            : std_logic;
     signal uart_rxd_meta_n      : std_logic;
@@ -59,15 +66,20 @@ begin
     -- -------------------------------------------------------------------------
     --  UART OVERSAMPLING (~16X) CLOCK DIVIDER AND CLOCK ENABLE FLAG
     -- -------------------------------------------------------------------------
-
+	 
+    UART_CLK_DIV_VAL <= UART_CLK_DIV_VAL_9600  when  (BAUD_RATE = '0') else
+                                               UART_CLK_DIV_VAL_115200;
+                                              
+    OS_CLK_DIV_VAL <= OS_CLK_DIV_VAL_9600  when  (BAUD_RATE = '0') else
+                                           OS_CLK_DIV_VAL_115200;	
+														 
     os_clk_divider_i : entity work.UART_CLK_DIV
-    generic map(
-        DIV_MAX_VAL  => OS_CLK_DIV_VAL,
-        DIV_MARK_POS => OS_CLK_DIV_VAL-1
-    )
+
     port map (
         CLK      => CLK,
         RST      => RST,
+        DIV_MAX_VAL  => OS_CLK_DIV_VAL,
+        DIV_MARK_POS => OS_CLK_DIV_VAL-1,
         CLEAR    => RST,
         ENABLE   => '1',
         DIV_MARK => os_clk_en
@@ -112,13 +124,12 @@ begin
     -- -------------------------------------------------------------------------
 
     uart_rx_i: entity work.UART_RX
-    generic map (
-        CLK_DIV_VAL => UART_CLK_DIV_VAL
-    )
+
     port map (
         CLK          => CLK,
         RST          => RST,
         PARITY_MODE => PARITY_MODE,
+        CLK_DIV_VAL => UART_CLK_DIV_VAL,
         -- UART INTERFACE
         UART_CLK_EN  => os_clk_en,
         UART_RXD     => uart_rxd_debounced,
@@ -134,14 +145,13 @@ begin
     -- -------------------------------------------------------------------------
 
     uart_tx_i: entity work.UART_TX
-    generic map (
-        CLK_DIV_VAL => UART_CLK_DIV_VAL
-    )
+
     port map (
         CLK         => CLK,
         RST         => RST,
         -- UART INTERFACE
-		PARITY_MODE => PARITY_MODE,
+		  PARITY_MODE => PARITY_MODE,
+        CLK_DIV_VAL => UART_CLK_DIV_VAL,
         UART_CLK_EN => os_clk_en,
         UART_TXD    => UART_TXD,
         -- USER DATA INPUT INTERFACE
