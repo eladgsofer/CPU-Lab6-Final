@@ -4,7 +4,7 @@ USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.STD_LOGIC_ARITH.ALL;
 
 ENTITY MIPS IS
-    GENERIC (BUS_W : INTEGER := 10; ADD_BUS: INTEGER :=8; QUARTUS : INTEGER := 0); -- QUARTUS MODE = 12; 10 | MODELSIM = 10; 8
+    GENERIC (BUS_W : INTEGER := 12; ADD_BUS: INTEGER :=10; QUARTUS : INTEGER := 1); -- QUARTUS MODE = 12; 10 | MODELSIM = 10; 8
         --GENERIC (BUS_W : INTEGER := 8; ADD_BUS: INTEGER :=8; QUARTUS : INTEGER := 0); -- QUARTUS MODE = 12; 10 | MODELSIM = 10; 8
     PORT(clock                  : IN    STD_LOGIC; 
         -- Output important signals to pins for easy display in Simulator
@@ -17,6 +17,8 @@ ENTITY MIPS IS
         LEDG, LEDR                      : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
         HEX0, HEX1, HEX2, HEX3          : OUT STD_LOGIC_VECTOR (6 DOWNTO 0);
         SW                              : IN  STD_LOGIC_VECTOR (7 DOWNTO 0);
+        UART_TXD                        : OUT STD_LOGIC;
+        UART_RXD                        : IN  STD_LOGIC;
         pushButtons						: IN  STD_LOGIC_VECTOR (3 DOWNTO 0));
 END     MIPS;
 
@@ -127,6 +129,8 @@ COMPONENT IO_top IS
             TYPEx                  : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 			LEDG, LEDR             : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 			HEX0, HEX1, HEX2, HEX3 : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+            UART_TXD               : OUT STD_LOGIC;
+            UART_RXD               : IN STD_LOGIC;
             dataout                : OUT STD_LOGIC_VECTOR(31 downto 0)
     );
 END COMPONENT;
@@ -319,6 +323,8 @@ BEGIN
               HEX1        => HEX1,
               HEX2        => HEX2,
               HEX3        => HEX3,
+              UART_TXD    => UART_TXD,
+              UART_RXD    => UART_RXD,
               dataout     => readDataIo
     );
     
