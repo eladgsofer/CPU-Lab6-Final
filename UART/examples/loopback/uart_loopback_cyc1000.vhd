@@ -64,8 +64,7 @@ begin
     port map (
         CLK          => CLK_12M,
         RST          => reset,
-		  -- Parity Mode: "Even" - 000, "Odd" - 001, "Mark" - 010, "space" - 011 None - 100
-		  PARITY_MODE => "000",
+		PARITY_MODE => "001",
         -- UART INTERFACE
         UART_TXD     => UART_TXD,
         UART_RXD     => UART_RXD,

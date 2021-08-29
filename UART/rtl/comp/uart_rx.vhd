@@ -17,10 +17,7 @@ entity UART_RX is
     Port (
         CLK          : in  std_logic; -- system clock
         RST          : in  std_logic; -- high active synchronous reset
-		  
-		  -- Parity Mode: "Even" - 000, "Odd" - 001, "Mark" - 010, "space" - 011 None - 100
         PARITY_MODE  : in  std_logic_vector(2 DOWNTO 0);
-		  
         -- UART INTERFACE
         UART_CLK_EN  : in  std_logic; -- oversampling (16x) UART clock enable
         UART_RXD     : in  std_logic; -- serial receive data
@@ -48,11 +45,12 @@ architecture RTL of UART_RX is
     type state is (idle, startbit, databits, paritybit, stopbit);
     signal fsm_pstate : state;
     signal fsm_nstate : state;
-	 
-	 SIGNAL RX_PARITY_ERR_NOT_NONE: std_logic;
-    SIGNAL RX_PARITY_ERR_IS_NONE: std_logic;
+    
+    SIGNAL RX_PARITY_ERR_NOT_NONE: std_logic;
+    SIGNAL RX_PARITY_ERR_NONE: std_logic;
 
 begin
+
 
     -- -------------------------------------------------------------------------
     -- UART RECEIVER CLOCK DIVIDER AND CLOCK ENABLE FLAG
@@ -104,22 +102,22 @@ begin
     end process;
 
     DOUT <= rx_data;
-	 
-	  rx_parity_error <= RX_PARITY_ERR_NOT_NONE  when  (PARITY_MODE = "000" OR PARITY_MODE = "001" OR PARITY_MODE = "010" OR PARITY_MODE = "011")  else
-						      RX_PARITY_ERR_IS_NONE;
 
     -- -------------------------------------------------------------------------
     -- UART RECEIVER PARITY GENERATOR AND CHECK
     -- -------------------------------------------------------------------------
 
+    	rx_parity_error <= RX_PARITY_ERR_NOT_NONE  when  (PARITY_MODE = "000" OR PARITY_MODE = "001" OR PARITY_MODE = "010" OR PARITY_MODE = "011")  else
+						   RX_PARITY_ERR_NONE;
+                              
         uart_rx_parity_gen_i: entity work.UART_PARITY
         generic map (
             DATA_WIDTH  => 8
         )
         port map (
             DATA_IN     => rx_data,
-            PARITY_OUT  => rx_parity_bit,
-				PARITY_MODE => PARITY_MODE
+				PARITY_MODE => PARITY_MODE,
+            PARITY_OUT  => rx_parity_bit
 				
         );
 
@@ -127,15 +125,12 @@ begin
         begin
             if (rising_edge(CLK)) then
                 if (rx_clk_en = '1') then
-                    RX_PARITY_ERR_NOT_NONE <= rx_parity_bit XOR UART_RXD;
+                    RX_PARITY_ERR_NOT_NONE  <= rx_parity_bit XOR UART_RXD;
                 end if;
             end if;
         end process;
-    
 
-    uart_rx_noparity_g : 
-        RX_PARITY_ERR_IS_NONE <= '0';
-    
+        RX_PARITY_ERR_NONE  <= '0';
 
     -- -------------------------------------------------------------------------
     -- UART RECEIVER OUTPUT REGISTER
@@ -175,7 +170,7 @@ begin
     end process;
 
     -- NEXT STATE AND OUTPUTS LOGIC
-    process (fsm_pstate, UART_RXD, rx_clk_en, rx_bit_count)
+    process (fsm_pstate, UART_RXD, rx_clk_en, rx_bit_count, PARITY_MODE)
     begin
         case fsm_pstate is
 
