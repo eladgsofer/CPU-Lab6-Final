@@ -118,7 +118,8 @@ architecture dfl of IO_top is
     SIGNAL rx_valid                  : STD_LOGIC;
     SIGNAL rx_full                   : STD_LOGIC;
     SIGNAL tx_empty                  : STD_LOGIC;
-    
+    signal rst_btn : std_logic;
+    signal uart_reset   : std_logic;
 begin
     write_clock <= NOT clk;
 
@@ -245,7 +246,9 @@ begin
                 tx_valid <= '1';
             ELSIF (tx_ready = '1') THEN
                 tx_empty <= '1';
+                tx_valid <= '0';
             ELSE
+                tx_valid <= '0';
                 tx_empty <= tx_empty;
             END IF;
         END IF;
@@ -264,7 +267,14 @@ begin
             END IF;
         END IF;
     end process;
-    
+    rst_btn <= not UCTL(0);
+
+    rst_sync_i : entity work.RST_SYNC
+    port map (
+        CLK        => clk, -- Make sure 24mhz is inserted
+        ASYNC_RST  => rst_btn,
+        SYNCED_RST => uart_reset
+    );
     UART_controller : UART
     Generic map(
         CLK_FREQ      => 24e6,   -- system clock frequency in Hz
@@ -273,7 +283,7 @@ begin
     Port map(
         -- CLOCK AND RESET
         CLK       => clk, -- system clock
-        RST       => reset, -- high active synchronous reset
+        RST       => uart_reset, -- high active synchronous reset
 		BAUD_RATE => UCTL(3),
 		  -- Parity Mode: "Even" - 000, "Odd" - 001, "Mark" - 010, "space" - 011 None - 100
         PARITY_MODE =>parity_mode,

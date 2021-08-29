@@ -33,7 +33,7 @@
 	
 #---------------------- Code Segment --------------------------	
 .text
-UartTX_ISR:
+
 main:	addi $sp,$zero,0x800 # $sp=0x800
 	addi $t0,$zero,0x3F  
 	sw   $t0,0x824       # BTIP=7, BTSSEL=3, BTHOLD=1
@@ -82,7 +82,8 @@ KEY3_ISR:
 BT_ISR:	addi $t0,$t0,1  # $t1=$t1+1
 	sw   $t0,0x800  # write to PORT_LEDG[7-0]
         jr   $k1        # reti
-        
+UartTX_ISR:
+	jr   $k1        # reti        
 UartRX_ISR:	
 	lw   $t1,0x821  # read RXBUF
 	sw   $t1,0x800  # write to PORT_LEDG[7-0]
