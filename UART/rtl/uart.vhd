@@ -61,6 +61,7 @@ architecture RTL of UART is
     signal uart_rxd_synced_n    : std_logic;
     signal uart_rxd_debounced_n : std_logic;
     signal uart_rxd_debounced   : std_logic;
+    SIGNAL uart_os_clk_div_val_minus_one : integer;
 
 begin
     -- -------------------------------------------------------------------------
@@ -72,14 +73,14 @@ begin
                                               
     OS_CLK_DIV_VAL <= OS_CLK_DIV_VAL_9600  when  (BAUD_RATE = '0') else
                                            OS_CLK_DIV_VAL_115200;	
-														 
+    uart_os_clk_div_val_minus_one <=			OS_CLK_DIV_VAL  - 1;											 
     os_clk_divider_i : entity work.UART_CLK_DIV
 
     port map (
         CLK      => CLK,
         RST      => RST,
         DIV_MAX_VAL  => OS_CLK_DIV_VAL,
-        DIV_MARK_POS => OS_CLK_DIV_VAL-1,
+        DIV_MARK_POS => uart_os_clk_div_val_minus_one,
         CLEAR    => RST,
         ENABLE   => '1',
         DIV_MARK => os_clk_en

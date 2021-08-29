@@ -149,7 +149,7 @@ BEGIN
 
          mw_U_2pulse <="111";
 		    wait for 2000 ns;
-		    mw_U_2pulse <="111";
+		    mw_U_2pulse <="110";
 		    wait for 2000 ns;
 		    mw_U_2pulse <="111";
 		    wait; 

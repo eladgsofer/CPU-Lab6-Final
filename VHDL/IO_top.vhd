@@ -72,14 +72,13 @@ architecture dfl of IO_top is
     component UART is
     Generic (
         CLK_FREQ      : integer := 50e6;   -- system clock frequency in Hz
-        BAUD_RATE     : integer := 115200; -- baud rate value
         USE_DEBOUNCER : boolean := True    -- enable/disable debouncer
     );
     Port (
         -- CLOCK AND RESET
         CLK          : in  std_logic; -- system clock
         RST          : in  std_logic; -- high active synchronous reset
-		  --BAUD_RATE    : in std_logic_vector(16 downto 0);
+		BAUD_RATE    : in  std_logic;
 		  
 		  -- Parity Mode: "Even" - 000, "Odd" - 001, "Mark" - 010, "space" - 011 None - 100
         PARITY_MODE: in std_logic_vector(2 downto 0);
@@ -203,6 +202,7 @@ begin
     rx_read  <= '1' WHEN (CS(9) = '1') AND (MemRead = '1') ELSE '0';
     tx_write <= '1' WHEN (CS(10) = '1') AND (MemWrite = '1') ELSE '0';
     
+    
     -- UCTL Reg  Proccess
     process (clk) begin
         IF (clk'EVENT and clk='1') THEN
@@ -210,6 +210,7 @@ begin
             -- CPU to UCTL
             IF (MemWrite='1' AND CS(8) = '1') THEN
                 UCTL(3 downto 0) <= datain(3 downto 0);
+                
                 IF (parity_enable = '1') THEN
                     IF (parity_select = '1') THEN
                         parity_mode <= "001"; -- Odd
@@ -229,6 +230,7 @@ begin
         END IF;
     end process;
     
+    
     Out_UCTL <= X"000000" & UCTL;
     software_reset_en <= datain(0);
     parity_enable     <= datain(1);
@@ -240,10 +242,11 @@ begin
         IF (clk'EVENT and clk='1') THEN
             IF (MemWrite='1' AND CS(10) = '1') THEN
                 tx_empty <= '0';
+                tx_valid <= '1';
             ELSIF (tx_ready = '1') THEN
                 tx_empty <= '1';
             ELSE
-                tx_empty <= '0';
+                tx_empty <= tx_empty;
             END IF;
         END IF;
     end process;
@@ -255,8 +258,9 @@ begin
                 rx_full <= '0';
             ELSIF (rx_valid = '1') THEN
                 rx_full <= '1';
+                -- TODO: If rx valid again then overflow
             ELSE
-                rx_full <= '0';
+                rx_full <= rx_full;
             END IF;
         END IF;
     end process;
@@ -264,14 +268,13 @@ begin
     UART_controller : UART
     Generic map(
         CLK_FREQ      => 24e6,   -- system clock frequency in Hz
-        BAUD_RATE     => 115200,
         USE_DEBOUNCER => True    -- enable/disable debouncer
     )
     Port map(
         -- CLOCK AND RESET
         CLK       => clk, -- system clock
         RST       => reset, -- high active synchronous reset
-		--BAUD_RATE => UCTL(3),
+		BAUD_RATE => UCTL(3),
 		  -- Parity Mode: "Even" - 000, "Odd" - 001, "Mark" - 010, "space" - 011 None - 100
         PARITY_MODE =>parity_mode,
         -- UART INTERFACE
