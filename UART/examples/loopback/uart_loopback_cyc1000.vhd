@@ -60,12 +60,13 @@ begin
     generic map (
         CLK_FREQ      => CLK_FREQ,
         BAUD_RATE     => BAUD_RATE,
-        USE_DEBOUNCER => USE_DEBOUNCER
+        USE_DEBOUNCER => USE_DEBOUNCER,
+        PARITY_BIT    => PARITY_BIT
     )
     port map (
         CLK          => CLK_12M,
         RST          => reset,
-		  PARITY_MODE => "000",
+		PARITY_MODE => "000",
         -- UART INTERFACE
         UART_TXD     => UART_TXD,
         UART_RXD     => UART_RXD,
