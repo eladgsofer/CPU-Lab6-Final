@@ -54,7 +54,7 @@ ARCHITECTURE struct OF MIPS_tb IS
    SIGNAL HEX3  : STD_LOGIC_VECTOR( 6 DOWNTO 0 );
    SIGNAL pushButtons : STD_LOGIC_VECTOR (3 DOWNTO 0);
    SIGNAL mw_U_2pulse : std_logic_vector(2 DOWNTO 0);
-
+   SIGNAL UART_TXD,UART_RXD :STD_LOGIC;
    -- Component Declarations
 COMPONENT MIPS IS
     GENERIC (BUS_W : INTEGER := 10; ADD_BUS: INTEGER :=8; QUARTUS : INTEGER := 0); -- QUARTUS MODE = 12; 10 | MODELSIM = 10; 8
@@ -70,6 +70,8 @@ COMPONENT MIPS IS
         LEDG, LEDR                      : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
         HEX0, HEX1, HEX2, HEX3          : OUT STD_LOGIC_VECTOR (6 DOWNTO 0);
         SW                              : IN  STD_LOGIC_VECTOR (7 DOWNTO 0);
+        UART_TXD                        : OUT STD_LOGIC;
+        UART_RXD                        : IN  STD_LOGIC;
         pushButtons						: IN  STD_LOGIC_VECTOR (3 DOWNTO 0));
 END     COMPONENT;
 	
@@ -121,6 +123,8 @@ BEGIN
          HEX1      => HEX1,
          HEX2        => HEX2,
          HEX3    => HEX3,
+         UART_TXD => UART_TXD,
+         UART_RXD => UART_RXD,
          pushButtons =>  pushButtons
       );
    U_1 : MIPS_tester
@@ -145,7 +149,7 @@ BEGIN
 
          mw_U_2pulse <="111";
 		    wait for 2000 ns;
-		    mw_U_2pulse <="111";
+		    mw_U_2pulse <="110";
 		    wait for 2000 ns;
 		    mw_U_2pulse <="111";
 		    wait; 

@@ -4,7 +4,7 @@ USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.STD_LOGIC_ARITH.ALL;
 
 ENTITY MIPS IS
-    GENERIC (BUS_W : INTEGER := 10; ADD_BUS: INTEGER :=8; QUARTUS : INTEGER := 0); -- QUARTUS MODE = 12; 10 | MODELSIM = 10; 8
+    GENERIC (BUS_W : INTEGER := 12; ADD_BUS: INTEGER :=10; QUARTUS : INTEGER := 1); -- QUARTUS MODE = 12; 10 | MODELSIM = 10; 8
         --GENERIC (BUS_W : INTEGER := 8; ADD_BUS: INTEGER :=8; QUARTUS : INTEGER := 0); -- QUARTUS MODE = 12; 10 | MODELSIM = 10; 8
     PORT(clock                  : IN    STD_LOGIC; 
         -- Output important signals to pins for easy display in Simulator
@@ -17,6 +17,8 @@ ENTITY MIPS IS
         LEDG, LEDR                      : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
         HEX0, HEX1, HEX2, HEX3          : OUT STD_LOGIC_VECTOR (6 DOWNTO 0);
         SW                              : IN  STD_LOGIC_VECTOR (7 DOWNTO 0);
+        UART_TXD                        : OUT STD_LOGIC;
+        UART_RXD                        : IN  STD_LOGIC;
         pushButtons						: IN  STD_LOGIC_VECTOR (3 DOWNTO 0));
 END     MIPS;
 
@@ -127,6 +129,8 @@ COMPONENT IO_top IS
             TYPEx                  : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 			LEDG, LEDR             : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 			HEX0, HEX1, HEX2, HEX3 : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+            UART_TXD               : OUT STD_LOGIC;
+            UART_RXD               : IN STD_LOGIC;
             dataout                : OUT STD_LOGIC_VECTOR(31 downto 0)
     );
 END COMPONENT;
@@ -162,9 +166,17 @@ END COMPONENT;
     SIGNAL GIE_ctl          : STD_LOGIC;
    	SIGNAL PC_OUT 			: STD_LOGIC_VECTOR( 9 DOWNTO 0 );
     SIGNAL is_k1            : STD_LOGIC;
+    signal CLK_12M : std_logic := '0';
     
     --SIGNAL Switches         : STD_LOGIC_VECTOR( 7 DOWNTO 0 );
 BEGIN
+
+	PROCESS (clock)
+		BEGIN
+			IF RISING_EDGE(clock) THEN
+                CLK_12M <= NOT CLK_12M;
+            END IF;
+	END PROCESS;
                     -- copy important signals to output pins for easy 
                     -- display in Simulator
    Instruction_out  <= Instruction;
@@ -201,7 +213,7 @@ BEGIN
                 Jr              => Jr,
                 Zero            => Zero,
                 PC_out          => PC_OUT,              
-                clock           => clock,  
+                clock           => CLK_12M,  
                 reset           => resetSync,
                 read_data		     => read_data,
 				        INTR			         => INTR,
@@ -218,7 +230,7 @@ BEGIN
                 MemtoReg        => MemtoReg,
                 RegDst          => RegDst,
                 Sign_extend     => Sign_extend,
-                clock           => clock,  
+                clock           => CLK_12M,  
                 reset           => resetSync,
                 INTR            => INTR,
                 INTA            => INTA,
@@ -238,7 +250,7 @@ BEGIN
                 Jump            => Jump,
                 Jr              => Jr,
                 ALUop           => ALUop,
-                clock           => clock,
+                clock           => CLK_12M,
                 reset           => resetSync,
                 INTR            => INTR,
                 INTA            => INTA,
@@ -261,7 +273,7 @@ BEGIN
                 Add_Result      => Add_Result,
                 Jump_Result     => Jump_Result,
                 PC_plus_4       => PC_plus_4,
-                Clock           => clock,
+                Clock           => CLK_12M,
                 Reset           => resetSync );
     
     --TYPEx_sized	<= TYPEx(9 DOWNTO 2) & "00";
@@ -275,7 +287,7 @@ BEGIN
                     write_data      => read_data_2,
                     MemRead         => MemRead, 
                     Memwrite        => MemWrite, 
-                    clock           => clock,  
+                    clock           => CLK_12M,  
                     reset           => resetSync,
                     INTR            => INTR,
                     TYPEx           => TYPEx(9 DOWNTO 0));
@@ -292,7 +304,7 @@ BEGIN
                     write_data      => read_data_2,
                     MemRead         => MemRead, 
                     Memwrite        => MemWrite, 
-                    clock           => clock,  
+                    clock           => CLK_12M,  
                     reset           => resetSync,
                     INTR            => INTR,
                     TYPEx           => TYPEx(9 DOWNTO 2));
@@ -305,7 +317,7 @@ BEGIN
               address     => ALU_Result(11 DOWNTO 0),        
               SW          => SW,
               pushButtons => pushButtons(3 DOWNTO 1),
-              clk         => clock,
+              clk         => CLK_12M,
               reset       => resetSync,
               MemRead     => MemRead,
               MemWrite    => Memwrite,
@@ -319,6 +331,8 @@ BEGIN
               HEX1        => HEX1,
               HEX2        => HEX2,
               HEX3        => HEX3,
+              UART_TXD    => UART_TXD,
+              UART_RXD    => UART_RXD,
               dataout     => readDataIo
     );
     
@@ -339,8 +353,8 @@ BEGIN
 --TODO - ADD A MUX BETWEEN IO AND MEMORY 
 
         
-    PROCESS (clock)BEGIN
-        if(rising_edge(Clock)) then
+    PROCESS (CLK_12M)BEGIN
+        if(rising_edge(CLK_12M)) then
             resetSync <= not pushButtons(0); 
         end if;   
     END PROCESS;
