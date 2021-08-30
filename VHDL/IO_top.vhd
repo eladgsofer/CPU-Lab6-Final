@@ -98,7 +98,7 @@ architecture dfl of IO_top is
     end component;
 	-----------------------------------------------------------
     --------------------------------------------------------------
-	SIGNAL Out_UCTL,Out_Rx,Out_Tx,out_IFG,Out_Buttons, Out_SW, Out_LEDG, Out_LEDR, Out_HEX0, Out_HEX1, Out_HEX2, Out_HEX3 : STD_LOGIC_VECTOR (31 DOWNTO 0);
+	SIGNAL Out_UCTL,Out_Rx,out_IFG,Out_Buttons, Out_SW, Out_LEDG, Out_LEDR, Out_HEX0, Out_HEX1, Out_HEX2, Out_HEX3 : STD_LOGIC_VECTOR (31 DOWNTO 0);
 	SIGNAL CS : STD_LOGIC_VECTOR (15 DOWNTO 0);
 	SIGNAL pushButtonsInput : STD_LOGIC_VECTOR(7 DOWNTO 0);
 	SIGNAL disp_LEDG,disp_LEDR : STD_LOGIC_VECTOR (7 DOWNTO 0);
@@ -137,7 +137,6 @@ begin
  			   Out_Buttons WHEN CS(7) = '1' ELSE
                Out_UCTL    WHEN CS(8) = '1' ELSE
                Out_Rx      WHEN CS(9) = '1' ELSE
-               Out_Tx      WHEN CS(10) = '1' ELSE
                out_IFG  WHEN CS(14) = '1' ELSE
                
 			   X"00000000";
@@ -198,7 +197,7 @@ begin
     );	              
     RxD_Reg : IO_ReadOnly port map(RxReg,MemRead,CS(9),Out_Rx);
     --RxD_Reg : IO_ReadOnly generic map(8) port map(datain(7 DOWNTO 0),MemRead,MemWrite,CS(9),write_clock,Out_Rx);
-    TxD_Reg : IO_Biderctional generic map(8) port map(datain(7 DOWNTO 0),MemRead,MemWrite,CS(10),write_clock,Out_Tx);
+    --TxD_Reg : IO_Biderctional generic map(8) port map(datain(7 DOWNTO 0),MemRead,MemWrite,CS(10),write_clock,Out_Tx);
     
     rx_read  <= '1' WHEN (CS(9) = '1') AND (MemRead = '1') ELSE '0';
     tx_write <= '1' WHEN (CS(10) = '1') AND (MemWrite = '1') ELSE '0';
@@ -243,6 +242,7 @@ begin
         IF (clk'EVENT and clk='1') THEN
             IF (MemWrite='1' AND CS(10) = '1') THEN
                 tx_empty <= '0';
+                tx_buffer(7 DOWNTO 0) <= datain(7 DOWNTO 0);
                 tx_valid <= '1';
             ELSIF (tx_ready = '1') THEN
                 tx_empty <= '1';
@@ -302,7 +302,7 @@ begin
         UART_TXD     => UART_TXD, -- serial transmit data
         UART_RXD     => UART_RXD, -- serial receive data
         -- USER DATA INPUT INTERFACE
-        DIN          => Out_Tx(7 DOWNTO 0), -- input data to be transmitted over UART
+        DIN          => tx_buffer(7 DOWNTO 0), -- input data to be transmitted over UART
         DIN_VLD      => tx_valid, -- when DIN_VLD = 1, input data (DIN) are valid
         DIN_RDY      => tx_ready, -- when DIN_RDY = 1, transmitter is ready and valid input data will be accepted for transmiting
         -- USER DATA OUTPUT INTERFACE
