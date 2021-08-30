@@ -112,7 +112,7 @@ architecture dfl of IO_top is
     SIGNAL frame_error, parity_error, overrun_error,BUSY            : STD_LOGIC;
     SIGNAL parity_mode : STD_LOGIC_VECTOR(2 DOWNTO 0);
     SIGNAL rx_read,tx_write          : STD_LOGIC;
-    SIGNAL rx_buffer, tx_buffer      : STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL rx_buffer, tx_buffer,RxReg      : STD_LOGIC_VECTOR(7 DOWNTO 0);
     SIGNAL tx_valid                  : STD_LOGIC;
     SIGNAL tx_ready                  : STD_LOGIC;
     SIGNAL rx_valid                  : STD_LOGIC;
@@ -176,8 +176,8 @@ begin
     
   INTRPT: interrupt PORT MAP (  
         clock			=> clk,
-        irq0			=> rx_full, 
-        irq1			=> tx_empty, 
+        irq0			=> rx_valid, 
+        irq1			=> tx_ready, 
         irq2			=> BTIFG, 
         irq3			=> pushButtons(0),
         irq4			=> pushButtons(1),
@@ -196,7 +196,7 @@ begin
         TYPEx			=> TYPEx,
         out_IFG			=> out_IFG
     );	              
-    RxD_Reg : IO_ReadOnly port map(rx_buffer,MemRead,CS(9),Out_Rx);
+    RxD_Reg : IO_ReadOnly port map(RxReg,MemRead,CS(9),Out_Rx);
     --RxD_Reg : IO_ReadOnly generic map(8) port map(datain(7 DOWNTO 0),MemRead,MemWrite,CS(9),write_clock,Out_Rx);
     TxD_Reg : IO_Biderctional generic map(8) port map(datain(7 DOWNTO 0),MemRead,MemWrite,CS(10),write_clock,Out_Tx);
     
@@ -275,6 +275,17 @@ begin
         ASYNC_RST  => rst_btn,
         SYNCED_RST => uart_reset
     );
+    
+    process (clk) is
+	begin
+		if falling_edge(clk) then
+			if( MemRead='1' AND CS(9) = '1' ) then
+				RxReg <= rx_buffer;
+            end if;
+        end if;
+    end process;
+    
+    
     UART_controller : UART
     Generic map(
         CLK_FREQ      => 24e6,   -- system clock frequency in Hz
