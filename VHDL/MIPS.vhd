@@ -166,9 +166,17 @@ END COMPONENT;
     SIGNAL GIE_ctl          : STD_LOGIC;
    	SIGNAL PC_OUT 			: STD_LOGIC_VECTOR( 9 DOWNTO 0 );
     SIGNAL is_k1            : STD_LOGIC;
+    signal CLK_12M : std_logic := '0';
     
     --SIGNAL Switches         : STD_LOGIC_VECTOR( 7 DOWNTO 0 );
 BEGIN
+
+	PROCESS (clock)
+		BEGIN
+			IF RISING_EDGE(clock) THEN
+                CLK_12M <= NOT CLK_12M;
+            END IF;
+	END PROCESS;
                     -- copy important signals to output pins for easy 
                     -- display in Simulator
    Instruction_out  <= Instruction;
@@ -205,7 +213,7 @@ BEGIN
                 Jr              => Jr,
                 Zero            => Zero,
                 PC_out          => PC_OUT,              
-                clock           => clock,  
+                clock           => CLK_12M,  
                 reset           => resetSync,
                 read_data		     => read_data,
 				        INTR			         => INTR,
@@ -222,7 +230,7 @@ BEGIN
                 MemtoReg        => MemtoReg,
                 RegDst          => RegDst,
                 Sign_extend     => Sign_extend,
-                clock           => clock,  
+                clock           => CLK_12M,  
                 reset           => resetSync,
                 INTR            => INTR,
                 INTA            => INTA,
@@ -242,7 +250,7 @@ BEGIN
                 Jump            => Jump,
                 Jr              => Jr,
                 ALUop           => ALUop,
-                clock           => clock,
+                clock           => CLK_12M,
                 reset           => resetSync,
                 INTR            => INTR,
                 INTA            => INTA,
@@ -265,7 +273,7 @@ BEGIN
                 Add_Result      => Add_Result,
                 Jump_Result     => Jump_Result,
                 PC_plus_4       => PC_plus_4,
-                Clock           => clock,
+                Clock           => CLK_12M,
                 Reset           => resetSync );
     
     --TYPEx_sized	<= TYPEx(9 DOWNTO 2) & "00";
@@ -279,7 +287,7 @@ BEGIN
                     write_data      => read_data_2,
                     MemRead         => MemRead, 
                     Memwrite        => MemWrite, 
-                    clock           => clock,  
+                    clock           => CLK_12M,  
                     reset           => resetSync,
                     INTR            => INTR,
                     TYPEx           => TYPEx(9 DOWNTO 0));
@@ -296,7 +304,7 @@ BEGIN
                     write_data      => read_data_2,
                     MemRead         => MemRead, 
                     Memwrite        => MemWrite, 
-                    clock           => clock,  
+                    clock           => CLK_12M,  
                     reset           => resetSync,
                     INTR            => INTR,
                     TYPEx           => TYPEx(9 DOWNTO 2));
@@ -309,7 +317,7 @@ BEGIN
               address     => ALU_Result(11 DOWNTO 0),        
               SW          => SW,
               pushButtons => pushButtons(3 DOWNTO 1),
-              clk         => clock,
+              clk         => CLK_12M,
               reset       => resetSync,
               MemRead     => MemRead,
               MemWrite    => Memwrite,
@@ -345,8 +353,8 @@ BEGIN
 --TODO - ADD A MUX BETWEEN IO AND MEMORY 
 
         
-    PROCESS (clock)BEGIN
-        if(rising_edge(Clock)) then
+    PROCESS (CLK_12M)BEGIN
+        if(rising_edge(CLK_12M)) then
             resetSync <= not pushButtons(0); 
         end if;   
     END PROCESS;

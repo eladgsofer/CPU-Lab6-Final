@@ -288,7 +288,7 @@ begin
     
     UART_controller : UART
     Generic map(
-        CLK_FREQ      => 24e6,   -- system clock frequency in Hz
+        CLK_FREQ      => 12e6,   -- system clock frequency in Hz
         USE_DEBOUNCER => True    -- enable/disable debouncer
     )
     Port map(
