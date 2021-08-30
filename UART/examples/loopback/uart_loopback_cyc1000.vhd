@@ -17,12 +17,13 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity UART_LOOPBACK_CYC1000 is
     Generic (
-        CLK_FREQ      : integer := 24e6;   -- set system clock frequency in Hz
-        
+
+        CLK_FREQ      : integer := 12e6;   -- set system clock frequency in Hz
+
         USE_DEBOUNCER : boolean := True    -- enable/disable debouncer
     );
     Port (
-        CLK_24M   : in  std_logic; -- system clock 24 MHz
+        CLK_24M   : in  std_logic; -- system clock 12 MHz
         RST_BTN_N : in  std_logic; -- low active reset button
         -- UART INTERFACE
         UART_TXD  : out std_logic;
@@ -36,14 +37,21 @@ architecture RTL of UART_LOOPBACK_CYC1000 is
     signal reset   : std_logic;
     signal data    : std_logic_vector(7 downto 0);
     signal valid   : std_logic;
-
+ signal CLK_12M : std_logic := '0';
 begin
+
+	PROCESS (CLK_24M)
+		BEGIN
+			IF RISING_EDGE(CLK_24M) THEN
+                CLK_12M <= NOT CLK_12M;
+            END IF;
+	END PROCESS;
     
     rst_btn <= not RST_BTN_N;
 
     rst_sync_i : entity work.RST_SYNC
     port map (
-        CLK        => CLK_24M, -- Make sure 12Mhz is inserted
+        CLK        => CLK_12M, -- Make sure 12Mhz is inserted
         ASYNC_RST  => rst_btn,
         SYNCED_RST => reset
     );
@@ -54,10 +62,11 @@ begin
         USE_DEBOUNCER => USE_DEBOUNCER
     )
     port map (
-        CLK          => CLK_24M,
+        CLK          => CLK_12M,
         RST          => reset,
 		  PARITY_MODE => "100",
-		  BAUD_RATE     => '0', -- 1 FOR 115200
+		  BAUD_RATE     => '1', -- 1 FOR 115200
+
         -- UART INTERFACE
         UART_TXD     => UART_TXD,
         UART_RXD     => UART_RXD,
