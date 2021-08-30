@@ -45,7 +45,7 @@
             // comboBoxCOM
             // 
             this.comboBoxCOM.FormattingEnabled = true;
-            this.comboBoxCOM.Items.AddRange(new object[] {
+            this.comboBoxCOM.Items.AddRange(new object[] {"COM5",
             "COM7"});
             this.comboBoxCOM.Location = new System.Drawing.Point(134, 88);
             this.comboBoxCOM.Name = "comboBoxCOM";

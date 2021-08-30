@@ -62,6 +62,7 @@ architecture dfl of IO_top is
             clock,irq0,irq1,irq2,irq3,irq4,irq5,INTA,GIE_enable,reset	: IN 	STD_LOGIC;
             data							                : IN	STD_LOGIC_VECTOR( 31 DOWNTO 0 );
             GIE_ctl,IFG_store_ctl,IFG_load_ctl,IE_ctl       : IN 	STD_LOGIC;
+            Status_error                                    : IN STD_LOGIC;
             Rx_read                                         : IN STD_LOGIC;
             Tx_Write                                        : IN STD_LOGIC;
             INTR							                : OUT 	STD_LOGIC;
@@ -96,6 +97,13 @@ architecture dfl of IO_top is
         PARITY_ERROR : out std_logic  -- when PARITY_ERROR = 1, parity bit was invalid (is assert only for one clock cycle)
     );
     end component;
+    component RST_SYNC is
+    Port (
+        CLK        : in  std_logic;
+        ASYNC_RST  : in  std_logic;
+        SYNCED_RST : out std_logic
+    );
+end component;
 	-----------------------------------------------------------
     --------------------------------------------------------------
 	SIGNAL Out_UCTL,Out_Rx,out_IFG,Out_Buttons, Out_SW, Out_LEDG, Out_LEDR, Out_HEX0, Out_HEX1, Out_HEX2, Out_HEX3 : STD_LOGIC_VECTOR (31 DOWNTO 0);
@@ -120,6 +128,7 @@ architecture dfl of IO_top is
     SIGNAL tx_empty                  : STD_LOGIC;
     signal rst_btn : std_logic;
     signal uart_reset   : std_logic;
+    signal status_error : std_logic;
 begin
     write_clock <= NOT clk;
 
@@ -189,6 +198,7 @@ begin
         IFG_store_ctl	=> ifg_write,
         IFG_load_ctl	=> ifg_read,
         IE_ctl			=> CS(13),
+        Status_error    => status_error,
         Rx_read         => rx_read,
         Tx_Write        => tx_write,
         INTR			=> INTR,
@@ -229,6 +239,7 @@ begin
             UCTL(7) <= BUSY;
         END IF;
     end process;
+    status_error <= UCTL(4) OR UCTL(5) OR UCTL(6);
     
     
     Out_UCTL <= X"000000" & UCTL;
@@ -259,8 +270,17 @@ begin
         IF (clk'EVENT and clk='1') THEN
             IF (MemRead='1' AND CS(9) = '1') THEN
                 rx_full <= '0';
+                overrun_error<='0';
+
             ELSIF (rx_valid = '1') THEN
-                rx_full <= '1';
+                IF (rx_full = '1') THEN
+                    overrun_error<='1';
+                    rx_full <='1';
+                ELSE
+                    overrun_error<='0';
+                    rx_full <= '1';
+                END IF;
+                
                 -- TODO: If rx valid again then overflow
             ELSE
                 rx_full <= rx_full;

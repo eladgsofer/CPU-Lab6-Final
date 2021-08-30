@@ -74,6 +74,7 @@ namespace TerminalPC
         {
             FormChat fc = new FormChat();
             fc.ShowDialog();
+
         }
 
         ////Open file transfer window

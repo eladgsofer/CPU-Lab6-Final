@@ -9,6 +9,7 @@ ENTITY Interrupt IS
     clock,irq0,irq1,irq2,irq3,irq4,irq5, INTA,GIE_enable,reset  : IN    STD_LOGIC;
     data                            : IN    STD_LOGIC_VECTOR( 31 DOWNTO 0 );
     GIE_ctl,IFG_store_ctl,IFG_load_ctl,IE_ctl           : IN    STD_LOGIC;
+    Status_error                    : IN STD_LOGIC;
     Rx_read                         : IN STD_LOGIC;
     Tx_Write                        : IN STD_LOGIC;
     INTR                            : OUT   STD_LOGIC;
@@ -22,8 +23,8 @@ ARCHITECTURE behavior OF interrupt IS
 
     SIGNAL  GIE             : STD_LOGIC; 
     SIGNAL  IE              : STD_LOGIC_VECTOR( 5 DOWNTO 0 );
-    SIGNAL  IFG,IFG2            : STD_LOGIC_VECTOR( 5 DOWNTO 0 );
-    SIGNAL  SERVICED            : STD_LOGIC_VECTOR(2 DOWNTO 0); -- FOR AUTOMATICALLY IFG TURNOFF
+    SIGNAL  IFG,IFG2            : STD_LOGIC_VECTOR( 6 DOWNTO 0 );
+    SIGNAL  SERVICED            : STD_LOGIC_VECTOR(3 DOWNTO 0); -- FOR AUTOMATICALLY IFG TURNOFF
     -- 0 waiting for intr = 1
     -- 1 waiting for inta = 1
     -- 2 waiting for inta = 0
@@ -95,12 +96,12 @@ BEGIN
     PROCESS (reset,clock)--,clock)
         BEGIN
             IF(reset='1') THEN
-                IFG <= "000000";
+                IFG <= "0000000";
             ELSIF(clock'EVENT AND clock='0') THEN -- 0 or 1?    
             
                 -- Read or Write to IFG
                 IF (IFG_store_ctl ='1') THEN  
-                    IFG <= data(5 DOWNTO 0);        
+                    IFG(5 DOWNTO 0) <= data(5 DOWNTO 0);        
                 ELSIF (IFG_load_ctl='1') THEN 
                     out_IFG <= X"000000" & "00" &IFG(5 downto 0);
 
@@ -111,7 +112,9 @@ BEGIN
                         IFG(0) <= '0'; --RX
                     ELSIF (SERVICED(1)='1') THEN 
                         IFG(1) <= '0'; --TX               
-                    ELSE 
+                    ELSIF (SERVICED(3)='1') THEN 
+                        IFG(6) <='0';
+                    ELSE
                         IFG(2) <= '0'; --BT
                     END IF;
 
@@ -136,11 +139,11 @@ BEGIN
     PROCESS ( GIE, irq0, irq1, irq2, irq3, irq4, irq5, reset, IFG_store_ctl, INTA, IE, Rx_read, Tx_Write, clock )
         BEGIN
             IF(reset='1') THEN
-                    IFG2 <= "000000";
+                    IFG2 <= "0000000";
             ELSIF (clock'EVENT AND clock='0') THEN
                 
                 IF (IFG_store_ctl ='1') THEN  -- store to
-                    IFG2 <= data(5 DOWNTO 0);
+                    IFG2(5 DOWNTO 0) <= data(5 DOWNTO 0);
                 
                 -- Automatically turn off the IFG when an interrupt finished it's ISR    
                 ELSIF (Inta_state = CleanIFG) THEN
@@ -149,7 +152,9 @@ BEGIN
                         IFG2(0) <= '0';
                     ELSIF (SERVICED(1)='1') THEN 
                         IFG2(1) <= '0';                    
-                    ELSE 
+                    ELSIF (SERVICED(3)='1') THEN
+                        IFG2(6) <= '0';
+                    ELSE
                         IFG2(2) <= '0';
                     END IF;
                 
@@ -160,7 +165,7 @@ BEGIN
                     IFG2(1) <= '0';
                 
                 -- The Value of ifg2 is by defualt changed when one of the interrupts is on and enabled
-                ELSIF (GIE = '1' AND INTA ='0') THEN
+                ELSIF (GIE = '1') THEN  -- AND INTA ='0'
                     CLEARED2 <= '0';
                     IF (irq0='1' AND IE(0) = '1')  THEN --Uart Rx
                         IFG2 (0) <= '1';
@@ -183,6 +188,9 @@ BEGIN
                     IF (irq5 = '0' AND IE(5) = '1')  THEN --Key3
                         IFG2 (5) <= '1';    
                     END IF;
+                    IF (Status_error = '1') THEN -- Status error
+                        IFG2(6) <= '1';
+                    END IF;
                 END IF;
             END IF;
         END PROCESS;
@@ -195,18 +203,22 @@ BEGIN
         BEGIN
             IF(clock'EVENT AND clock='1') THEN
             IF GIE = '1' AND INTA = '0'  then 
-                    IF    IE(0) = '1' AND IFG (0) = '1' THEN --Uart Rx
+                    IF    (IFG(6) = '1') THEN
+                        TYPEx <= X"000000" & "00000100"; -- "0x04" 
+                        INTR_REG    <= '1';
+                        SERVICED <= "1000";
+                    elsIF    IE(0) = '1' AND IFG (0) = '1' THEN --Uart Rx
                         TYPEx <= X"000000" & "00001000"; -- "0x08" 
                         INTR_REG    <= '1';
-                        SERVICED <= "001";
+                        SERVICED <= "0001";
                     elsif     IE(1) = '1' AND IFG (1) = '1' THEN --Uart Tx
                         TYPEx <= X"000000" & "00001100"; -- "0x0C" 
                         INTR_REG    <= '1';
-                        SERVICED <= "010";
+                        SERVICED <= "0010";
                     elsif     IE(2) = '1' AND IFG (2) = '1' THEN --BTIFG
                         TYPEx <= X"000000" & "00010000"; -- "0x10" 
                         INTR_REG    <= '1';
-                        SERVICED <= "100";
+                        SERVICED <= "0100";
                     elsif IE(3) = '1' AND   IFG(3) = '1' THEN --Key1IFG     
                         TYPEx <= X"000000" & "00010100"; -- "0x14" 
                         INTR_REG    <= '1';

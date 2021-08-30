@@ -23,6 +23,7 @@ namespace TerminalPC
 {
     public partial class FormChat : Form
     {
+        string indata_rs= "";
         public FormChat()
         {
             InitializeComponent();
@@ -51,6 +52,7 @@ namespace TerminalPC
                     MessageBox.Show(ex.ToString());
                 }
 
+
                 textBox1.Text = "";
             } 
         }
@@ -62,22 +64,29 @@ namespace TerminalPC
 
         public void port_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            string indata;
+            string indata ="";
             SerialPort sp = (SerialPort)sender;
             System.Threading.Thread.Sleep(500);
-
+                
             if (!Home.port.IsOpen)
             {
                 Home.port.Open();
             }
 
-            indata = Home.port.ReadExisting();
+            while (Home.port.BytesToRead > 0)
+            {
+                indata  += ((char)Home.port.ReadChar()).ToString();
+            }
 
-            // Clean the buffer
-            MessageBox.Show("[" + DateTime.Now + "]: " + indata);
+            MessageBox.Show(indata);
         }
 
         private void FormChat_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void richTextBox1_TextChanged(object sender, EventArgs e)
         {
 
         }

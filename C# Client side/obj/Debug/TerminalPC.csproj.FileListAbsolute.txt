@@ -35,3 +35,15 @@ C:\Users\elads\Desktop\Terminal-Project\C# Client side\obj\Debug\TerminalPC.cspr
 C:\Users\elads\Desktop\Terminal-Project\C# Client side\obj\Debug\TerminalPC.csproj.CoreCompileInputs.cache
 C:\Users\elads\Desktop\Terminal-Project\C# Client side\obj\Debug\TerminalPC.exe
 C:\Users\elads\Desktop\Terminal-Project\C# Client side\obj\Debug\TerminalPC.pdb
+C:\Users\tomer\OneDrive\Documents\university\cpu_architcture\final_project\CPU_Lab6_Final\C# Client side\bin\Debug\TerminalPC.exe.config
+C:\Users\tomer\OneDrive\Documents\university\cpu_architcture\final_project\CPU_Lab6_Final\C# Client side\bin\Debug\TerminalPC.exe
+C:\Users\tomer\OneDrive\Documents\university\cpu_architcture\final_project\CPU_Lab6_Final\C# Client side\bin\Debug\TerminalPC.pdb
+C:\Users\tomer\OneDrive\Documents\university\cpu_architcture\final_project\CPU_Lab6_Final\C# Client side\obj\Debug\TerminalPC.csproj.AssemblyReference.cache
+C:\Users\tomer\OneDrive\Documents\university\cpu_architcture\final_project\CPU_Lab6_Final\C# Client side\obj\Debug\TerminalPC.Home.resources
+C:\Users\tomer\OneDrive\Documents\university\cpu_architcture\final_project\CPU_Lab6_Final\C# Client side\obj\Debug\TerminalPC.FormChat.resources
+C:\Users\tomer\OneDrive\Documents\university\cpu_architcture\final_project\CPU_Lab6_Final\C# Client side\obj\Debug\TerminalPC.FormFileTransfer.resources
+C:\Users\tomer\OneDrive\Documents\university\cpu_architcture\final_project\CPU_Lab6_Final\C# Client side\obj\Debug\TerminalPC.Properties.Resources.resources
+C:\Users\tomer\OneDrive\Documents\university\cpu_architcture\final_project\CPU_Lab6_Final\C# Client side\obj\Debug\TerminalPC.csproj.GenerateResource.cache
+C:\Users\tomer\OneDrive\Documents\university\cpu_architcture\final_project\CPU_Lab6_Final\C# Client side\obj\Debug\TerminalPC.csproj.CoreCompileInputs.cache
+C:\Users\tomer\OneDrive\Documents\university\cpu_architcture\final_project\CPU_Lab6_Final\C# Client side\obj\Debug\TerminalPC.exe
+C:\Users\tomer\OneDrive\Documents\university\cpu_architcture\final_project\CPU_Lab6_Final\C# Client side\obj\Debug\TerminalPC.pdb
